@@ -1,8 +1,13 @@
 import { Context } from "../context"
 import type { Filter, LogDescription, Log } from "ethers"
 
-export class EventAggregator {
+export class EventScraper {
   constructor(public context: Context) { }
+
+  async getLogs(from: number, to: number): Promise<LogDescription[]> {
+    const rawLogs = await this.getRawLogs(from, to)
+    return this.parseRawLogs(rawLogs)
+  }
 
   async getRawLogs(from: number, to: number): Promise<Log[]> {
     const filter: Filter = {
@@ -13,8 +18,7 @@ export class EventAggregator {
     return this.context.provider.getLogs(filter)
   }
 
-  async getLogs(from: number, to: number): Promise<LogDescription[]> {
-    const rawLogs = await this.getRawLogs(from, to)
+  async parseRawLogs(rawLogs: Log[]): Promise<LogDescription[]> {
     const iface = this.context.getEventInterface()
     const logs = rawLogs.map((log) => iface.parseLog({
       topics: log.topics,

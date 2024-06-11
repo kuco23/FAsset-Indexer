@@ -4,10 +4,13 @@ const ADDRESS_LENGTH = 42
 const BYTES32_LENGTH = 66
 
 @Entity()
-export class EvmEvent {
+export class EvmLog {
 
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
+
+  @OneToMany(() => EvmLogTopic, topic => topic.evmLog, { cascade: [Cascade.ALL] })
+  topics = new Collection<EvmLogTopic>(this)
 
   @Property({ type: "text" })
   data: string
@@ -16,15 +19,12 @@ export class EvmEvent {
   blockNumber: number
 
   @Property({ type: "text", length: ADDRESS_LENGTH, nullable: true })
-  address?: string
+  address: string
 
   @Property({ type: "text", length: BYTES32_LENGTH, nullable: true })
-  transactionHash?: string
+  transactionHash: string
 
-  @OneToMany(() => EvmEventTopic, topic => topic.evmEvent, { cascade: [Cascade.ALL] })
-  topics = new Collection<EvmEventTopic>(this)
-
-  constructor(topics: EvmEventTopic[], data: string, blockNumber: number, address?: string, transactionHash?: string) {
+  constructor(topics: EvmLogTopic[], data: string, blockNumber: number, address: string, transactionHash: string) {
     for (const topic of topics) {
       this.topics.add(topic)
     }
@@ -37,15 +37,38 @@ export class EvmEvent {
 }
 
 @Entity()
-export class EvmEventTopic {
+export class EvmLogTopic {
 
-  @PrimaryKey({ type: 'text', length: BYTES32_LENGTH })
+  @PrimaryKey({ type: "number", autoincrement: true })
+  id!: number
+
+  @ManyToOne(() => EvmLog, { fieldName: 'topics' })
+  evmLog!: EvmLog
+
+  @Property({ type: 'text', length: BYTES32_LENGTH })
   hash: string
-
-  @ManyToOne(() => EvmEvent, { fieldName: 'topics' })
-  evmEvent!: EvmEvent
 
   constructor(hash: string) {
     this.hash = hash
   }
+
+}
+
+@Entity()
+export class Var {
+
+  @PrimaryKey({ type: "number", autoincrement: true })
+  id!: number
+
+  @Property({ type: "text", unique: true })
+  key: string
+
+  @Property({ type: "text" })
+  value: string
+
+  constructor(key: string, value: string) {
+    this.key = key
+    this.value = value
+  }
+
 }

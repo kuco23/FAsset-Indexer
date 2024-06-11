@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { SqliteDriver } from '@mikro-orm/sqlite'
 import _CONTRACTS from '../coston.json'
 import { abi as AssetManagerAbi } from '../artifacts/AssetManager.json'
@@ -7,6 +8,7 @@ import type { OrmOptions } from './database/interface'
 
 export interface IConfig {
   rpcUrl: string
+  apiKey?: string
   contracts: typeof _CONTRACTS
   abis: {
     events: any
@@ -17,6 +19,7 @@ export interface IConfig {
 
 export const config: IConfig = {
   rpcUrl: "https://coston-api.flare.network/ext/C/rpc",
+  apiKey: process.env.FLARE_API_KEY,
   contracts: _CONTRACTS,
   abis: {
     events: AMEAbi,

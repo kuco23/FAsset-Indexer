@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "FAsset monitor for open beta",
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "metrics": "yarn ts-node src/cli/metrics.ts"
   },
   "license": "MIT",
   "devDependencies": {
@@ -23,6 +24,8 @@
     "@mikro-orm/mysql": "^6.2.9",
     "@mikro-orm/postgresql": "^6.2.9",
     "@mikro-orm/sqlite": "^6.2.9",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
     "ethers": "^6.13.0",
     "mikro-orm": "^6.2.9"
   },
