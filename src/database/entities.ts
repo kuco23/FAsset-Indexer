@@ -1,13 +1,15 @@
 import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../constants";
 
-const ADDRESS_LENGTH = 42
-const BYTES32_LENGTH = 66
 
 @Entity()
 export class EvmLog {
 
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
+
+  @Property({ type: "text", length: ADDRESS_LENGTH, nullable: true })
+  address: string
 
   @OneToMany(() => EvmLogTopic, topic => topic.evmLog, { cascade: [Cascade.ALL] })
   topics = new Collection<EvmLogTopic>(this)
@@ -18,22 +20,22 @@ export class EvmLog {
   @Property({ type: "number" })
   blockNumber: number
 
-  @Property({ type: "text", length: ADDRESS_LENGTH, nullable: true })
-  address: string
+  @Property({ type: "number" })
+  transactionIndex: number
 
-  @Property({ type: "text", length: BYTES32_LENGTH, nullable: true })
-  transactionHash: string
+  @Property({ type: "number" })
+  logIndex: number
 
-  constructor(topics: EvmLogTopic[], data: string, blockNumber: number, address: string, transactionHash: string) {
+  constructor(address: string, topics: EvmLogTopic[], data: string, blockNumber: number, transactionIndex: number, logIndex: number) {
+    this.address = address
     for (const topic of topics) {
       this.topics.add(topic)
     }
     this.data = data
     this.blockNumber = blockNumber
-    this.address = address
-    this.transactionHash = transactionHash
+    this.transactionIndex = transactionIndex
+    this.logIndex = logIndex
   }
-
 }
 
 @Entity()
@@ -51,7 +53,6 @@ export class EvmLogTopic {
   constructor(hash: string) {
     this.hash = hash
   }
-
 }
 
 @Entity()
@@ -70,5 +71,4 @@ export class Var {
     this.key = key
     this.value = value
   }
-
 }

@@ -2,6 +2,7 @@ import { createOrm } from "../database/utils"
 import { EvmLog } from "../database/entities"
 import { Context } from "../context"
 import { EventScraper } from "./scraper"
+import { REDEMPTION_DEFAULTED, REDEMPTION_PERFORMED } from "../constants"
 import type { Interface, LogDescription } from "ethers"
 
 export class EventMetrics {
@@ -14,18 +15,20 @@ export class EventMetrics {
   }
 
   async totalRedeemed(): Promise<bigint> {
-    const aggregator = (value: bigint, log: LogDescription): bigint => {
-      if (log.name === "RedemptionPerformed") {
-        value += BigInt(log.args[5])
-      }
-      return value
-    }
-    return this.eventAggregator("RedemptionPerformed", BigInt(0), aggregator)
+    return this.eventAggregator(REDEMPTION_PERFORMED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(log.args[5])
+    })
+  }
+
+  async totalRedemptionDefaultValue(): Promise<bigint> {
+    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(log.args[3])
+    })
   }
 
   private async eventAggregator<T>(eventName: string, value: T, aggregator: (value: T, log: LogDescription) => T): Promise<T> {
-    const topic = this.getLogTopic(eventName)
     const orm = await createOrm(this.context.config.database, "safe")
+    const topic = this.getLogTopic(eventName)
     const logs = await orm.em.fork().find(EvmLog, { topics: { hash: topic } })
     for (const log of logs) {
       await log.topics.load()

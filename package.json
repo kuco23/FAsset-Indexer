@@ -4,7 +4,8 @@
   "description": "FAsset monitor for open beta",
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
-    "metrics": "yarn ts-node src/cli/metrics.ts"
+    "metrics": "yarn ts-node src/cli/metrics.ts",
+    "indexer": "yarn ts-node src/cli/indexer.ts"
   },
   "license": "MIT",
   "devDependencies": {

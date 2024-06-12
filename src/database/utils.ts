@@ -1,5 +1,7 @@
 import { MikroORM } from "@mikro-orm/core"
 import { ORM_OPTIONS } from "./mikro-orm.config"
+import { Var } from "./entities"
+import type { EntityManager } from "@mikro-orm/knex"
 import type { ORM, OrmOptions, SchemaUpdate } from "./interface"
 
 export async function createOrm(options: OrmOptions, update: SchemaUpdate): Promise<ORM> {
@@ -20,4 +22,20 @@ export async function updateSchema(orm: ORM, update: SchemaUpdate = "full"): Pro
   } else {
     await generator.updateSchema({ safe: update === "safe" });
   }
+}
+
+export async function setVar(key: string, value: string, em: EntityManager) {
+  let vr = await em.findOne(Var, { key })
+  if (!vr) {
+    let vr = new Var(key, value)
+    em.persist(vr)
+  } else {
+    vr.value = value
+  }
+  await em.flush()
+}
+
+export async function getVar(key: string, em: EntityManager): Promise<string | undefined> {
+  const val = await em.findOne(Var, { key })
+  return val?.value
 }
