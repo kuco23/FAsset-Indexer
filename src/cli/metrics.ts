@@ -11,7 +11,7 @@ const program = new Command("Open Beta Monitor CLI")
 program
   .command('aggregate')
   .description('Get the total amount of redemption')
-  .argument('<totalRedeemed|totalRedemptionDefaultValue>', 'The metric to aggregate')
+  .argument('<totalMinted|totalMintingFees|totalRedeemed|totalRedemptionDefaultValue>', 'The metric to aggregate')
   .action(async (metricName: string) => {
     const metricInfo = await (eventMetrics as any)[metricName]()
     console.log(`${metricName}: ${metricInfo}`)

@@ -1,8 +1,8 @@
 import { createOrm } from "../database/utils"
-import { EvmLog } from "../database/entities"
+import { EvmLog } from "../database/entities/logs"
 import { Context } from "../context"
 import { EventScraper } from "./scraper"
-import { REDEMPTION_DEFAULTED, REDEMPTION_PERFORMED } from "../constants"
+import { MINTING_EXECUTED, REDEMPTION_DEFAULTED, REDEMPTION_PERFORMED } from "../constants"
 import type { Interface, LogDescription } from "ethers"
 
 export class EventMetrics {
@@ -14,6 +14,18 @@ export class EventMetrics {
     this.evmEventIface = this.context.getEventInterface()
   }
 
+  async totalMinted(): Promise<bigint> {
+    return this.eventAggregator(MINTING_EXECUTED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(log.args[2])
+    })
+  }
+
+  async totalMintingFees(): Promise<bigint> {
+    return this.eventAggregator(MINTING_EXECUTED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(log.args[3])
+    })
+  }
+
   async totalRedeemed(): Promise<bigint> {
     return this.eventAggregator(REDEMPTION_PERFORMED, BigInt(0), (value: bigint, log: LogDescription) => {
       return value + BigInt(log.args[5])
@@ -23,6 +35,18 @@ export class EventMetrics {
   async totalRedemptionDefaultValue(): Promise<bigint> {
     return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
       return value + BigInt(log.args[3])
+    })
+  }
+
+  async totalRedemptionDefaults(): Promise<bigint> {
+    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(1)
+    })
+  }
+
+  async totalRedeemedPoolCollateral(): Promise<bigint> {
+    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+      return value + BigInt(log.args[5])
     })
   }
 

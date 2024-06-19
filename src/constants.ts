@@ -2,6 +2,7 @@
 export const FIRST_UNHANDLED_EVENT_BLOCK_KEY = "firstUnhandledEventBlock"
 
 // event names
+export const MINTING_EXECUTED = "MintingExecuted"
 export const REDEMPTION_PERFORMED = "RedemptionPerformed"
 export const REDEMPTION_DEFAULTED = "RedemptionDefault"
 

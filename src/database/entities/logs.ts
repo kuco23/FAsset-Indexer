@@ -1,12 +1,20 @@
-import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
-import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../constants";
+import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property, PrimaryKeyProp } from "@mikro-orm/core";
+import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../../constants";
 
 
 @Entity()
 export class EvmLog {
 
-  @PrimaryKey({ type: "number", autoincrement: true })
-  id!: number
+  @PrimaryKey({ type: "number" })
+  blockNumber: number
+
+  @PrimaryKey({ type: "number" })
+  transactionIndex: number
+
+  @PrimaryKey({ type: "number" })
+  logIndex: number
+
+  [PrimaryKeyProp]?: [number, number, number]
 
   @Property({ type: "text", length: ADDRESS_LENGTH, nullable: true })
   address: string
@@ -16,15 +24,6 @@ export class EvmLog {
 
   @Property({ type: "text" })
   data: string
-
-  @Property({ type: "number" })
-  blockNumber: number
-
-  @Property({ type: "number" })
-  transactionIndex: number
-
-  @Property({ type: "number" })
-  logIndex: number
 
   constructor(address: string, topics: EvmLogTopic[], data: string, blockNumber: number, transactionIndex: number, logIndex: number) {
     this.address = address
