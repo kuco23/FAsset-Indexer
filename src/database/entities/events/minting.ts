@@ -1,6 +1,6 @@
 import { Entity, Property, ManyToOne, PrimaryKey, BigIntType, OneToOne } from '@mikro-orm/core'
-import { AgentVault } from './agent'
-import { ADDRESS_LENGTH, BYTES32_LENGTH } from '../../constants'
+import { AgentVault } from '../agent'
+import { ADDRESS_LENGTH, BYTES32_LENGTH } from '../../../constants'
 
 
 @Entity()
@@ -43,9 +43,9 @@ export class CollateralReserved {
   executorFeeNatWei: bigint
 
   constructor(
+    collateralReservationId: number,
     agentVault: AgentVault,
     minter: string,
-    collateralReservationId: number,
     valueUBA: bigint,
     feeUBA: bigint,
     firstUnderlyingBlock: number,

@@ -2,16 +2,14 @@ import { createOrm } from "../database/utils"
 import { EvmLog } from "../database/entities/logs"
 import { Context } from "../context"
 import { EventScraper } from "./scraper"
-import { MINTING_EXECUTED, REDEMPTION_DEFAULTED, REDEMPTION_PERFORMED } from "../constants"
+import { MINTING_EXECUTED, REDEMPTION_DEFAULT, REDEMPTION_PERFORMED } from "../constants"
 import type { Interface, LogDescription } from "ethers"
 
 export class EventMetrics {
   eventScraper: EventScraper
-  evmEventIface: Interface
 
   constructor(public context: Context) {
     this.eventScraper = new EventScraper(context)
-    this.evmEventIface = this.context.getEventInterface()
   }
 
   async totalMinted(): Promise<bigint> {
@@ -33,19 +31,19 @@ export class EventMetrics {
   }
 
   async totalRedemptionDefaultValue(): Promise<bigint> {
-    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+    return this.eventAggregator(REDEMPTION_DEFAULT, BigInt(0), (value: bigint, log: LogDescription) => {
       return value + BigInt(log.args[3])
     })
   }
 
   async totalRedemptionDefaults(): Promise<bigint> {
-    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+    return this.eventAggregator(REDEMPTION_DEFAULT, BigInt(0), (value: bigint, log: LogDescription) => {
       return value + BigInt(1)
     })
   }
 
   async totalRedeemedPoolCollateral(): Promise<bigint> {
-    return this.eventAggregator(REDEMPTION_DEFAULTED, BigInt(0), (value: bigint, log: LogDescription) => {
+    return this.eventAggregator(REDEMPTION_DEFAULT, BigInt(0), (value: bigint, log: LogDescription) => {
       return value + BigInt(log.args[5])
     })
   }
@@ -56,7 +54,7 @@ export class EventMetrics {
     const logs = await orm.em.fork().find(EvmLog, { topics: { hash: topic } })
     for (const log of logs) {
       await log.topics.load()
-      const event = this.evmEventIface.parseLog({
+      const event = this.context.assetManagerEventInterface.parseLog({
         topics: log.topics.map((topic) => topic.hash),
         data: log.data
       })
@@ -69,8 +67,7 @@ export class EventMetrics {
   }
 
   getLogTopic(eventName: string): string | undefined {
-    const iface = this.context.getEventInterface()
-    return iface.getEvent(eventName)?.topicHash
+    return this.context.assetManagerEventInterface.getEvent(eventName)?.topicHash
   }
 
 }

@@ -1,17 +1,36 @@
-import { JsonRpcProvider, Interface, FetchRequest } from "ethers"
+import { JsonRpcProvider, Interface, FetchRequest, Contract } from "ethers"
 import { createOrm, setVar, getVar } from "./database/utils"
 import type { IConfig } from "./config"
 
 
 export class Context {
   provider: JsonRpcProvider
+  assetManagerEventInterface: Interface
 
   constructor(public config: IConfig) {
-    const connection = new FetchRequest(config.rpcUrl)
-    if (config.apiKey !== undefined) {
-      connection.setHeader('x-api-key', config.apiKey)
+    this.provider = this.getEthersApiProvider(config.rpcUrl, config.apiKey)
+    this.assetManagerEventInterface = this.getAssetManagerEventInterface()
+  }
+
+  getEthersApiProvider(rpcUrl: string, apiKey?: string): JsonRpcProvider {
+    const connection = new FetchRequest(rpcUrl)
+    if (apiKey !== undefined) {
+      connection.setHeader('x-api-key', apiKey)
     }
-    this.provider = new JsonRpcProvider(connection)
+    return new JsonRpcProvider(connection)
+  }
+
+  getAssetManagerEventInterface(): Interface {
+    return new Interface(this.config.abis.events)
+  }
+
+  getAssetManagerContract(fAsset: string): Contract {
+    const contractName = `AssetManager_${fAsset}`
+    const address = this.getContractAddress(contractName)
+    if (address === undefined) {
+      throw new Error(`Contract address not found for ${contractName}`)
+    }
+    return new Contract(address, this.config.abis.assetManager, this.provider)
   }
 
   getContractAddress(name: string): string | undefined {
@@ -21,17 +40,13 @@ export class Context {
     }
   }
 
-  getEventInterface(): Interface {
-    return new Interface(this.config.abis.events)
-  }
-
-  async setVar(key: string, value: string) {
+  async setDbVar(key: string, value: string) {
     const orm = await createOrm(this.config.database, "safe")
     await setVar(key, value, orm.em.fork())
     await orm.close()
   }
 
-  async getVar(key: string): Promise<string | undefined> {
+  async getDbVar(key: string): Promise<string | undefined> {
     const orm = await createOrm(this.config.database, "safe")
     const value = await getVar(key, orm.em.fork())
     await orm.close()

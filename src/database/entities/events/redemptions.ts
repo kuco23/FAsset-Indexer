@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property, BigIntType, OneToOne } from "@mikro-orm/core"
-import { AgentVault } from "./agent"
-import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../../constants"
+import { AgentVault } from "../agent"
+import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../../../constants"
 
 
 @Entity()
@@ -100,7 +100,7 @@ export class RedemptionPerformed {
 }
 
 @Entity()
-export class RedemptionDefaulted {
+export class RedemptionDefault {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
   redemptionRequested: RedemptionRequested
@@ -121,9 +121,6 @@ export class RedemptionDefaulted {
     this.redeemedPoolCollateralWei = redeemedPoolCollateralWei
   }
 }
-
-////////////////////////////////////////////////////////////////////////
-// weird redemption failures
 
 @Entity()
 export class RedemptionRejected {
@@ -189,21 +186,3 @@ export class RedemptionPaymentFailed {
 
 ////////////////////////////////////////////////////////////////////////
 // not bound to a redemption request, but redemption related
-
-@Entity()
-export class RedemptionRequestIncomplete {
-
-  @PrimaryKey({ type: "number", autoincrement: true })
-  id!: number
-
-  @Property({ type: "string", length: ADDRESS_LENGTH })
-  redeemer: string
-
-  @Property({ type: 'number' })
-  remainingLots: number
-
-  constructor(redeemer: string, remainingLots: number) {
-    this.redeemer = redeemer
-    this.remainingLots = remainingLots
-  }
-}

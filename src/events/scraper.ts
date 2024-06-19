@@ -19,7 +19,7 @@ export class EventScraper {
   }
 
   async parseRawLogs(rawLogs: Log[]): Promise<LogDescription[]> {
-    const iface = this.context.getEventInterface()
+    const iface = this.context.assetManagerEventInterface
     const logs = rawLogs.map((log) => iface.parseLog(log))
     return logs.filter((log) => log !== null) as LogDescription[]
   }

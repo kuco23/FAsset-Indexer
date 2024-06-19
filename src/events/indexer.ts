@@ -23,8 +23,7 @@ export class EventIndexer {
       start = firstUnhandledBlock
     }
     for (let i = start; i < end; i += LOG_FETCH_SIZE) {
-      const logFetch = () => this.eventScraper.getRawLogs(i, i + LOG_FETCH_SIZE)
-      const logs = await retryUntilSuccess(logFetch, LOG_FETCH_RETRY_LIMIT)
+      const logs = await this.getRawLogsWithRetry(i, i + LOG_FETCH_SIZE)
       await this.storeRawLogs(orm.em, logs, i + LOG_FETCH_SIZE)
       console.log(`Processed logs from block ${i} to block ${i + LOG_FETCH_SIZE - 1}`)
       await sleep(LOG_FETCH_SLEEP_MS)
@@ -36,7 +35,7 @@ export class EventIndexer {
     await em.transactional(async (_em) => {
       for (const log of logs) {
         const topics = log.topics.map((hash) => new EvmLogTopic(hash))
-        const event = new EvmLog(log.address, topics, log.data, log.blockNumber, log.transactionIndex, log.index)
+        const event = new EvmLog(log.blockNumber, log.transactionIndex, log.index, log.address, topics, log.data)
         _em.persist(event)
       }
       await setVar(FIRST_UNHANDLED_EVENT_BLOCK_KEY, firstUnhandledBlock.toString(), _em)
@@ -44,8 +43,13 @@ export class EventIndexer {
     })
   }
 
+  private async getRawLogsWithRetry(from: number, to: number): Promise<Log[]> {
+    const logFetch = () => this.eventScraper.getRawLogs(from, to)
+    return await retryUntilSuccess(logFetch, LOG_FETCH_RETRY_LIMIT)
+  }
+
   private async firstUnhandledBlock(): Promise<number> {
-    const lastBlock = await this.context.getVar(FIRST_UNHANDLED_EVENT_BLOCK_KEY)
+    const lastBlock = await this.context.getDbVar(FIRST_UNHANDLED_EVENT_BLOCK_KEY)
     return lastBlock !== undefined ? parseInt(lastBlock) : 0
   }
 }

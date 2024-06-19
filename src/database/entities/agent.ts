@@ -8,7 +8,7 @@ export class AgentManager {
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
 
-  @Property({ type: 'text', length: ADDRESS_LENGTH })
+  @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
 
   @OneToMany(() => Agent, vault => vault.manager, { cascade: [Cascade.ALL] })
@@ -46,13 +46,13 @@ export class AgentVault {
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
 
-  @Property({ type: 'text', length: ADDRESS_LENGTH })
+  @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
 
-  @Property({ type: 'text' })
+  @Property({ type: 'text', unique: true })
   underlyingAddress: string
 
-  @Property({ type: 'text', length: ADDRESS_LENGTH })
+  @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   collateralPool: string
 
   @ManyToOne(() => Agent, { fieldName: 'vaults' })

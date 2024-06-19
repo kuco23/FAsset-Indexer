@@ -20,5 +20,18 @@ program
       : await context.provider.getBlockNumber()
     await eventIndexer.run(start, end)
   })
+  .command('run')
+  .description('Run the indexer')
+  .option('-s, --start <number>', 'Start block number', '16146574')
+  .action(async (options: OptionValues) => {
+    const start = parseInt(options.start)
+
+  })
+
+async function runIndexer(start: number) {
+  
+  const end = await context.provider.getBlockNumber()
+  await eventIndexer.run(start, end)
+}
 
 program.parseAsync()

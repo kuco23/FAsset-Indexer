@@ -1,6 +1,6 @@
 import { MikroORM } from "@mikro-orm/core"
 import { ORM_OPTIONS } from "./mikro-orm.config"
-import { Var } from "./entities/logs"
+import { Var } from "./entities/state/var"
 import type { EntityManager } from "@mikro-orm/knex"
 import type { ORM, OrmOptions, SchemaUpdate } from "./interface"
 
