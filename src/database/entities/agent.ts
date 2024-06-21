@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property, Reference } from "@mikro-orm/core"
+import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
@@ -41,14 +41,14 @@ export class AgentOwner {
   address: string
 
   @ManyToOne(() => AgentManager, { fieldName: 'agents' })
-  manager: Reference<AgentManager>
+  manager: AgentManager
 
   @OneToMany(() => AgentVault, vault => vault.owner, { cascade: [Cascade.ALL] })
   vaults = new Collection<AgentVault>(this)
 
   constructor(address: string, manager: AgentManager) {
     this.address = address
-    this.manager = Reference.create(manager)
+    this.manager = manager
   }
 }
 
@@ -68,13 +68,13 @@ export class AgentVault {
   collateralPool: string
 
   @ManyToOne(() => AgentOwner, { fieldName: 'vaults' })
-  owner: Reference<AgentOwner>
+  owner: AgentOwner
 
   constructor(address: string, underlyingAddress: string, collateralPool: string,  owner: AgentOwner) {
     this.address = address
     this.underlyingAddress = underlyingAddress
     this.collateralPool = collateralPool
-    this.owner = Reference.create(owner)
+    this.owner = owner
   }
 
 }

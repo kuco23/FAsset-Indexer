@@ -14,7 +14,7 @@ export class CollateralToken {
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
 
-  @Property({ type: 'number', precision: 3 })
+  @Property({ type: 'number' })
   decimals: number
 
   @Property({ type: 'boolean' })

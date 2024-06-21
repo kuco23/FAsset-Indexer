@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, ManyToOne, Property, Reference } from '@mikro-orm/core'
+import { Entity, PrimaryKey, ManyToOne, Property } from '@mikro-orm/core'
 import { EventBound } from '../logs'
 import { AgentVault } from '../agent'
 import { ADDRESS_LENGTH } from '../../../constants'
@@ -11,14 +11,14 @@ class LiquidationStartedBase extends EventBound {
   id!: number
 
   @ManyToOne({ entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
   @Property({ type: 'number' })
   timestamp: number
 
   constructor(evmLog: EvmLog, agentVault: AgentVault, timestamp: number) {
     super(evmLog)
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
     this.timestamp = timestamp
   }
 }
@@ -36,7 +36,7 @@ export class LiquidationPerformed extends EventBound {
   id!: number
 
   @ManyToOne({ entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
   @Property({ type: 'text', length: ADDRESS_LENGTH })
   liquidator: string
@@ -46,7 +46,7 @@ export class LiquidationPerformed extends EventBound {
 
   constructor(evmLog: EvmLog, agentVault: AgentVault, liquidator: string, valueUBA: number) {
     super(evmLog)
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
     this.liquidator = liquidator
     this.valueUBA = valueUBA
   }
@@ -59,10 +59,10 @@ export class LiquidationEnded extends EventBound {
   id!: number
 
   @ManyToOne({ entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
   constructor(evmLog: EvmLog, agentVault: AgentVault) {
     super(evmLog)
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
   }
 }

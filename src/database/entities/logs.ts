@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, Unique, OneToOne, Reference } from "@mikro-orm/core"
+import { Entity, PrimaryKey, Property, Unique, OneToOne } from "@mikro-orm/core"
 import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../../constants"
 
 @Entity()
@@ -46,10 +46,10 @@ export class EvmLog {
 export class EventBound {
 
   @OneToOne({ entity: () => EvmLog, owner: true, unique: true })
-  evmLog: Reference<EvmLog>
+  evmLog: EvmLog
 
   constructor(evmLog: EvmLog) {
-    this.evmLog = Reference.create(evmLog)
+    this.evmLog = evmLog
   }
 
 }

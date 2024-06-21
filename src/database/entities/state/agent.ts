@@ -1,4 +1,4 @@
-import { Entity, Property, ManyToOne, BigIntType, OneToOne, Reference } from '@mikro-orm/core'
+import { Entity, Property, ManyToOne, BigIntType, OneToOne } from '@mikro-orm/core'
 import { AgentVault } from '../agent'
 import { CollateralToken } from '../token'
 
@@ -7,10 +7,10 @@ import { CollateralToken } from '../token'
 export class AgentVaultSettings {
 
   @OneToOne({ primary: true, owner: true, entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
   @ManyToOne({ entity: () => CollateralToken })
-  collateralToken: Reference<CollateralToken>
+  collateralToken: CollateralToken
 
   @Property({ type: new BigIntType('bigint') })
   feeBIPS: bigint
@@ -48,8 +48,8 @@ export class AgentVaultSettings {
     poolTopupCollateralRatioBIPS: bigint,
     poolTopupTokenPriceFactorBIPS: bigint
   ) {
-    this.agentVault = Reference.create(agentVault)
-    this.collateralToken = Reference.create(collateralToken)
+    this.agentVault = agentVault
+    this.collateralToken = collateralToken
     this.feeBIPS = feeBIPS
     this.poolFeeShareBIPS = poolFeeShareBIPS
     this.mintingVaultCollateralRatioBIPS = mintingVaultCollateralRatioBIPS
@@ -65,9 +65,9 @@ export class AgentVaultSettings {
 export class AgentVaultInfo {
 
   @OneToOne({ primary: true, owner: true, entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
-  @Property({ type: 'number', precision: 1 })
+  @Property({ type: 'number' })
   status: number
 
   @Property({ type: 'boolean' })
@@ -166,7 +166,7 @@ export class AgentVaultInfo {
     requiredUnderlyingBalanceUBA: bigint,
     freeUnderlyingBalanceUBA: bigint
   ) {
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
     this.status = status
     this.publiclyAvailable = publiclyAvailable
     this.freeCollateralLots = freeCollateralLots

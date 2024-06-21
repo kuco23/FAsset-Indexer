@@ -11,7 +11,7 @@ export function randomNativeAddress() {
   return randomHex(ADDRESS_LENGTH-2)
 }
 
-export function randomBytes32() {
+export function randomHash() {
   return randomHex(BYTES32_LENGTH-2)
 }
 
@@ -34,7 +34,7 @@ export function randomLog(name: string) {
     logIndex: randomNumber(0, 10),
     name: name,
     address: randomNativeAddress(),
-    transaction: randomBytes32(),
+    transaction: randomHash(),
     timestamp: Date.now()
   }
 }

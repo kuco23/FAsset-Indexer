@@ -1,4 +1,4 @@
-import { Entity, Property, ManyToOne, PrimaryKey, BigIntType, OneToOne, Reference } from '@mikro-orm/core'
+import { Entity, Property, ManyToOne, PrimaryKey, BigIntType, OneToOne } from '@mikro-orm/core'
 import { EvmLog, EventBound } from '../logs'
 import { AgentVault } from '../agent'
 import { ADDRESS_LENGTH, BYTES32_LENGTH } from '../../../constants'
@@ -10,8 +10,8 @@ export class CollateralReserved extends EventBound {
   @PrimaryKey({ type: 'number' })
   collateralReservationId: number
 
-  @ManyToOne({ entity: () => AgentVault})
-  agentVault: Reference<AgentVault>
+  @ManyToOne({ entity: () => AgentVault })
+  agentVault: AgentVault
 
   @Property({ type: 'text', length: ADDRESS_LENGTH })
   minter: string
@@ -59,7 +59,7 @@ export class CollateralReserved extends EventBound {
     executorFeeNatWei: bigint
   ) {
     super(evmLog)
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
     this.minter = minter
     this.collateralReservationId = collateralReservationId
     this.valueUBA = valueUBA
@@ -78,14 +78,14 @@ export class CollateralReserved extends EventBound {
 export class MintingExecuted extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => CollateralReserved })
-  collateralReserved: Reference<CollateralReserved>
+  collateralReserved: CollateralReserved
 
   @Property({ type: new BigIntType('bigint') })
   poolFeeUBA: bigint
 
   constructor(evmLog: EvmLog, collateralReserved: CollateralReserved, poolFeeUBA: bigint) {
     super(evmLog)
-    this.collateralReserved = Reference.create(collateralReserved)
+    this.collateralReserved = collateralReserved
     this.poolFeeUBA = poolFeeUBA
   }
 }
@@ -93,12 +93,12 @@ export class MintingExecuted extends EventBound {
 @Entity()
 export class MintingPaymentDefault extends EventBound {
 
-  @OneToOne({ primary: true, entity: () => CollateralReserved, owner: true  })
-  collateralReserved: Reference<CollateralReserved>
+  @OneToOne(() => CollateralReserved, { primary: true, entity: () => CollateralReserved, owner: true })
+  collateralReserved: CollateralReserved
 
   constructor(evmLog: EvmLog, collateralReserved: CollateralReserved) {
     super(evmLog)
-    this.collateralReserved = Reference.create(collateralReserved)
+    this.collateralReserved = collateralReserved
   }
 }
 
@@ -106,10 +106,10 @@ export class MintingPaymentDefault extends EventBound {
 export class CollateralReservationDeleted extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => CollateralReserved })
-  collateralReserved: Reference<CollateralReserved>
+  collateralReserved: CollateralReserved
 
   constructor(evmLog: EvmLog, collateralReserved: CollateralReserved) {
     super(evmLog)
-    this.collateralReserved = Reference.create(collateralReserved)
+    this.collateralReserved = collateralReserved
   }
 }

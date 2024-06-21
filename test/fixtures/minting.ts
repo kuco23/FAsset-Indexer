@@ -1,5 +1,5 @@
 import { AGENT_FIXTURE } from "./agent"
-import { randomNativeAddress, randomUnderlyingAddress, randomBytes32 } from "./utils"
+import { randomNativeAddress, randomUnderlyingAddress, randomHash } from "./utils"
 
 
 const COLLATERAL_RESERVED_1 = {
@@ -12,7 +12,7 @@ const COLLATERAL_RESERVED_1 = {
   lastUnderlyingBlock: 1313440,
   lastUnderlyingTimestamp: 2312411,
   paymentAddress: randomUnderlyingAddress(),
-  paymentReference: randomBytes32(),
+  paymentReference: randomHash(),
   executor: randomNativeAddress(),
   executorFeeNatWei: BigInt(1e16)
 }
@@ -21,14 +21,14 @@ const COLLATERAL_RESERVED_2 = {
   ...COLLATERAL_RESERVED_1,
   collateralReservationId: 2,
   agentVault: AGENT_FIXTURE[0].agents[0].vaults[1].address,
-  paymentReference: randomBytes32()
+  paymentReference: randomHash()
 }
 
 const COLLATERAL_RESERVED_3 = {
   ...COLLATERAL_RESERVED_1,
   collateralReservationId: 3,
   agentVault: AGENT_FIXTURE[0].agents[0].vaults[2].address,
-  paymentReference: randomBytes32()
+  paymentReference: randomHash()
 }
 
 const MINTING_EXECUTED = {
@@ -73,5 +73,5 @@ export const MINTING_FIXTURE = {
 export type CollateralReservedFixture = typeof COLLATERAL_RESERVED_1
 export type MintingExecutedFixture = typeof MINTING_EXECUTED
 export type MintingPaymentDefaultFixture = typeof MINTING_PAYMENT_DEFAULT
-export type MintingReservationDeletedFixture = typeof COLLATERAL_RESERVATION_DELETED
+export type CollateralReservationDeletedFixture = typeof COLLATERAL_RESERVATION_DELETED
 export type MintingFixture = typeof MINTING_FIXTURE

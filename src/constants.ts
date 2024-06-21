@@ -28,4 +28,7 @@ export const LIQUIDATION_STARTED = "LiquidationStarted"
 export const FULL_LIQUIDATION_STARTED = "FullLiquidationStarted"
 export const LIQUIDATION_PERFORMED = "LiquidationPerformed"
 export const LIQUIDATION_ENDED = "LiquidationEnded"
+// todo
 export const COLLATERAL_TYPE_ADDED = "CollateralTypeAdded"
+export const COLLATERAL_TYPE_DEPRECATED = "CollateralTypeDeprecated"
+export const AGENT_COLLATERAL_TYPE_CHANGED = "AgentCollateralTypeChanged"

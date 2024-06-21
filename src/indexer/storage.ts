@@ -10,7 +10,12 @@ import {
   RedemptionRequested, RedemptionPerformed, RedemptionDefault,
   RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected
 } from "../database/entities/events/redemption"
-import { AgentSettingChanged, RedemptionRequestIncomplete } from "../database/entities/events/tracking"
+import {
+  FullLiquidationStarted, LiquidationEnded, LiquidationPerformed, LiquidationStarted
+} from "../database/entities/events/liquidation"
+import {
+  AgentSettingChanged, RedemptionRequestIncomplete
+} from "../database/entities/events/tracking"
 import {
   AGENT_VAULT_CREATED, AGENT_SETTING_CHANGED,
   COLLATERAL_RESERVED, MINTING_EXECUTED, MINTING_PAYMENT_DEFAULT, COLLATERAL_RESERVATION_DELETED,
@@ -23,7 +28,6 @@ import {
 import type { Log, LogDescription } from "ethers"
 import type { EntityManager } from "@mikro-orm/knex"
 import type { ORM } from "../database/interface"
-import { FullLiquidationStarted, LiquidationEnded, LiquidationPerformed, LiquidationStarted } from "../database/entities/events/liquidation"
 
 
 export abstract class EventStorage {
@@ -212,9 +216,9 @@ export abstract class EventStorage {
   }
 
   protected async storeRedemptionPerformed(em: EntityManager, evmLog: EvmLog, logDescription: LogDescription): Promise<void> {
-    const [ ,, requestId, transactionHash, redemptionAmountUBA, spentUnderlyingUBA ] = logDescription.args
+    const [ ,, requestId, transactionHash, spentUnderlyingUBA ] = logDescription.args
     const redemptionRequested = await em.findOneOrFail(RedemptionRequested, { requestId: requestId })
-    const redemptionPerformed = new RedemptionPerformed(evmLog, redemptionRequested, transactionHash, redemptionAmountUBA, spentUnderlyingUBA)
+    const redemptionPerformed = new RedemptionPerformed(evmLog, redemptionRequested, transactionHash, spentUnderlyingUBA)
     em.persist(redemptionPerformed)
   }
 

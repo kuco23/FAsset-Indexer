@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property, BigIntType, OneToOne, Reference } from "@mikro-orm/core"
+import { Entity, ManyToOne, PrimaryKey, Property, BigIntType, OneToOne } from "@mikro-orm/core"
 import { AgentVault } from "../agent"
 import { EvmLog, EventBound } from "../logs"
 import { ADDRESS_LENGTH, BYTES32_LENGTH } from "../../../constants"
@@ -11,7 +11,7 @@ export class RedemptionRequested extends EventBound {
   requestId: number
 
   @ManyToOne({ entity: () => AgentVault })
-  agentVault: Reference<AgentVault>
+  agentVault: AgentVault
 
   @Property({ type: 'text', length: ADDRESS_LENGTH })
   redeemer: string
@@ -59,7 +59,7 @@ export class RedemptionRequested extends EventBound {
     executorFeeNatWei: bigint
   ) {
     super(evmLog)
-    this.agentVault = Reference.create(agentVault)
+    this.agentVault = agentVault
     this.redeemer = redeemer
     this.requestId = requestId
     this.paymentAddress = paymentAddress
@@ -78,13 +78,10 @@ export class RedemptionRequested extends EventBound {
 export class RedemptionPerformed extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
-  redemptionRequested: Reference<RedemptionRequested>
+  redemptionRequested: RedemptionRequested
 
   @Property({ type: 'text', length: BYTES32_LENGTH })
   transactionHash: string
-
-  @Property({ type: 'number' })
-  blockNumber: number
 
   @Property({ type: new BigIntType('bigint') })
   spentUnderlyingUBA: bigint
@@ -93,13 +90,11 @@ export class RedemptionPerformed extends EventBound {
     evmLog: EvmLog,
     redemptionRequested: RedemptionRequested,
     transactionHash: string,
-    blockNumber: number,
     spentUnderlyingUBA: bigint
   ) {
     super(evmLog)
-    this.redemptionRequested = Reference.create(redemptionRequested)
+    this.redemptionRequested = redemptionRequested
     this.transactionHash = transactionHash
-    this.blockNumber = blockNumber
     this.spentUnderlyingUBA = spentUnderlyingUBA
   }
 }
@@ -108,7 +103,7 @@ export class RedemptionPerformed extends EventBound {
 export class RedemptionDefault extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
-  redemptionRequested: Reference<RedemptionRequested>
+  redemptionRequested: RedemptionRequested
 
   @Property({ type: new BigIntType('bigint') })
   redeemedVaultCollateralWei: bigint
@@ -123,7 +118,7 @@ export class RedemptionDefault extends EventBound {
     redeemedPoolCollateralWei: bigint
   ) {
     super(evmLog)
-    this.redemptionRequested = Reference.create(redemptionRequested)
+    this.redemptionRequested = redemptionRequested
     this.redeemedVaultCollateralWei = redeemedVaultCollateralWei
     this.redeemedPoolCollateralWei = redeemedPoolCollateralWei
   }
@@ -133,11 +128,11 @@ export class RedemptionDefault extends EventBound {
 export class RedemptionRejected extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
-  redemptionRequested: Reference<RedemptionRequested>
+  redemptionRequested: RedemptionRequested
 
   constructor(evmLog: EvmLog, redemptionRequested: RedemptionRequested) {
     super(evmLog)
-    this.redemptionRequested = Reference.create(redemptionRequested)
+    this.redemptionRequested = redemptionRequested
   }
 }
 
@@ -145,7 +140,7 @@ export class RedemptionRejected extends EventBound {
 export class RedemptionPaymentBlocked extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
-  redemptionRequested: Reference<RedemptionRequested>
+  redemptionRequested: RedemptionRequested
 
   @Property({ type: 'text', length: BYTES32_LENGTH })
   transactionHash: string
@@ -160,7 +155,7 @@ export class RedemptionPaymentBlocked extends EventBound {
     spentUnderlyingUBA: bigint
   ) {
     super(evmLog)
-    this.redemptionRequested = Reference.create(redemptionRequested)
+    this.redemptionRequested = redemptionRequested
     this.transactionHash = transactionHash
     this.spentUnderlyingUBA = spentUnderlyingUBA
   }
@@ -170,13 +165,13 @@ export class RedemptionPaymentBlocked extends EventBound {
 export class RedemptionPaymentFailed extends EventBound {
 
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
-  redemptionRequested: Reference<RedemptionRequested>
+  redemptionRequested: RedemptionRequested
 
   @Property({ type: 'text', length: BYTES32_LENGTH })
   transactionHash: string
 
-  @Property({ type: 'number' })
-  spentUnderlyingUBA: number
+  @Property({ type: new BigIntType('bigint') })
+  spentUnderlyingUBA: bigint
 
   @Property({ type: 'text' })
   failureReason: string
@@ -185,11 +180,11 @@ export class RedemptionPaymentFailed extends EventBound {
     evmLog: EvmLog,
     redemptionRequested: RedemptionRequested,
     transactionHash: string,
-    spentUnderlyingUBA: number,
+    spentUnderlyingUBA: bigint,
     failureReason: string
   ) {
     super(evmLog)
-    this.redemptionRequested = Reference.create(redemptionRequested)
+    this.redemptionRequested = redemptionRequested
     this.transactionHash = transactionHash
     this.spentUnderlyingUBA = spentUnderlyingUBA
     this.failureReason = failureReason
