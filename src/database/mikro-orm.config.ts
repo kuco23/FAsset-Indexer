@@ -1,8 +1,8 @@
 import { defineConfig } from "@mikro-orm/core"
 import { SqliteDriver } from "@mikro-orm/sqlite"
 import { Var } from "./entities/state/var"
-import { EvmLog, EvmLogTopic } from "./entities/logs"
-import { AgentManager, Agent, AgentVault } from "./entities/agent"
+import { EvmLog } from "./entities/logs"
+import { AgentManager, AgentOwner, AgentVault } from "./entities/agent"
 import {
   CollateralReserved, MintingExecuted,
   MintingPaymentDefault, CollateralReservationDeleted
@@ -10,20 +10,25 @@ import {
 import {
   RedemptionRequested, RedemptionPerformed, RedemptionDefault,
   RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected
-} from "../database/entities/events/redemptions"
-import { RedemptionRequestIncomplete } from "../database/entities/events/misc"
+} from "./entities/events/redemption"
+import {
+  LiquidationEnded, LiquidationPerformed, LiquidationStarted
+} from "./entities/events/liquidation"
+import { RedemptionRequestIncomplete, AgentSettingChanged } from "./entities/events/tracking"
+import { AgentVaultInfo, AgentVaultSettings } from "./entities/state/agent"
 import type { Options } from "@mikro-orm/core"
 import type { AbstractSqlDriver } from "@mikro-orm/knex"
 
 
 export const ORM_OPTIONS: Options<AbstractSqlDriver> = defineConfig({
   entities: [
-    Var, EvmLog, EvmLogTopic,
-    AgentManager, Agent, AgentVault,
+    Var, EvmLog,
+    AgentManager, AgentOwner, AgentVault, AgentVaultSettings, AgentVaultInfo,
     CollateralReserved, MintingExecuted, MintingPaymentDefault, CollateralReservationDeleted,
     RedemptionRequested, RedemptionPerformed, RedemptionDefault,
     RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected,
-    RedemptionRequestIncomplete
+    LiquidationStarted, LiquidationPerformed, LiquidationEnded,
+    RedemptionRequestIncomplete, AgentSettingChanged
   ],
   driver: SqliteDriver,
   dbName: "fasset-open-beta-monitor.db",

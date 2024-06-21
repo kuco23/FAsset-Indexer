@@ -40,6 +40,10 @@ export class Context {
     }
   }
 
+  getLogTopic(name: string): string | undefined {
+    return this.assetManagerEventInterface.getEvent(name)?.topicHash
+  }
+
   async setDbVar(key: string, value: string) {
     const orm = await createOrm(this.config.database, "safe")
     await setVar(key, value, orm.em.fork())

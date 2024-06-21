@@ -1,5 +1,5 @@
 import { Command } from "commander"
-import { EventMetrics } from "../events/metrics"
+import { EventMetrics } from "../indexer/metrics"
 import { Context } from "../context"
 import { config } from "../config"
 

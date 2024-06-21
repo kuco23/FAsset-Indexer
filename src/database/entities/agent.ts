@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core"
+import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property, Reference } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
@@ -11,16 +11,28 @@ export class AgentManager {
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
 
-  @OneToMany(() => Agent, vault => vault.manager, { cascade: [Cascade.ALL] })
-  agents = new Collection<Agent>(this)
+  @Property({ type: 'text', nullable: true})
+  name?: string
 
-  constructor(address: string) {
+  @Property({ type: 'text', nullable: true })
+  description?: string
+
+  @Property({ type: 'text', nullable: true })
+  iconUrl?: string
+
+  @OneToMany(() => AgentOwner, vault => vault.manager, { cascade: [Cascade.ALL] })
+  agents = new Collection<AgentOwner>(this)
+
+  constructor(address: string, name?: string, description?: string, iconUrl?: string) {
     this.address = address
+    this.name = name
+    this.description = description
+    this.iconUrl = iconUrl
   }
 }
 
 @Entity()
-export class Agent {
+export class AgentOwner {
 
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
@@ -29,14 +41,14 @@ export class Agent {
   address: string
 
   @ManyToOne(() => AgentManager, { fieldName: 'agents' })
-  manager: AgentManager
+  manager: Reference<AgentManager>
 
   @OneToMany(() => AgentVault, vault => vault.owner, { cascade: [Cascade.ALL] })
   vaults = new Collection<AgentVault>(this)
 
   constructor(address: string, manager: AgentManager) {
     this.address = address
-    this.manager = manager
+    this.manager = Reference.create(manager)
   }
 }
 
@@ -55,14 +67,14 @@ export class AgentVault {
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   collateralPool: string
 
-  @ManyToOne(() => Agent, { fieldName: 'vaults' })
-  owner: Agent
+  @ManyToOne(() => AgentOwner, { fieldName: 'vaults' })
+  owner: Reference<AgentOwner>
 
-  constructor(address: string, underlyingAddress: string, collateralPool: string,  owner: Agent) {
+  constructor(address: string, underlyingAddress: string, collateralPool: string,  owner: AgentOwner) {
     this.address = address
     this.underlyingAddress = underlyingAddress
     this.collateralPool = collateralPool
-    this.owner = owner
+    this.owner = Reference.create(owner)
   }
 
 }

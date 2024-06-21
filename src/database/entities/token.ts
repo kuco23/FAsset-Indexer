@@ -1,4 +1,4 @@
-import { Entity, Property, PrimaryKey, BigIntType } from "@mikro-orm/core"
+import { Entity, Property, PrimaryKey } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
@@ -14,7 +14,7 @@ export class CollateralToken {
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
 
-  @Property({ type: 'number' })
+  @Property({ type: 'number', precision: 3 })
   decimals: number
 
   @Property({ type: 'boolean' })
@@ -26,15 +26,6 @@ export class CollateralToken {
   @Property({ type: 'text' })
   tokenFtsoSymbol: string
 
-  @Property({ type: new BigIntType('bigint') })
-  minCollateralRatioBIPS: bigint
-
-  @Property({ type: new BigIntType('bigint') })
-  ccbMinCollateralRatioBIPS: bigint
-
-  @Property({ type: new BigIntType('bigint') })
-  safetyMinCollateralRatioBIPS: bigint
-
   constructor(
     collateralClass: number,
     address: string,
@@ -42,9 +33,6 @@ export class CollateralToken {
     directPricePair: boolean,
     assetFtsoSymbol: string,
     tokenFtsoSymbol: string,
-    minCollateralRatioBIPS: bigint,
-    ccbMinCollateralRatioBIPS: bigint,
-    safetyMinCollateralRatioBIPS: bigint
   ) {
     this.collateralClass = collateralClass
     this.address = address
@@ -52,8 +40,5 @@ export class CollateralToken {
     this.directPricePair = directPricePair
     this.assetFtsoSymbol = assetFtsoSymbol
     this.tokenFtsoSymbol = tokenFtsoSymbol
-    this.minCollateralRatioBIPS = minCollateralRatioBIPS
-    this.ccbMinCollateralRatioBIPS = ccbMinCollateralRatioBIPS
-    this.safetyMinCollateralRatioBIPS = safetyMinCollateralRatioBIPS
   }
 }

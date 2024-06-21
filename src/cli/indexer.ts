@@ -1,7 +1,7 @@
 import { Command, OptionValues } from "commander"
 import { config } from "../config"
 import { Context } from "../context"
-import { EventIndexer } from "../events/indexer"
+import { EventIndexer } from "../indexer/indexer"
 
 
 const program = new Command("Open Beta Monitor CLI")
@@ -29,7 +29,7 @@ program
   })
 
 async function runIndexer(start: number) {
-  
+
   const end = await context.provider.getBlockNumber()
   await eventIndexer.run(start, end)
 }
