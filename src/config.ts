@@ -1,8 +1,8 @@
 import "dotenv/config"
 import { SqliteDriver } from '@mikro-orm/sqlite'
-import _CONTRACTS from '../coston.json'
-import { abi as AssetManagerAbi } from '../artifacts/AssetManager.json'
-import { abi as AMEAbi } from '../artifacts/AMEvents.json'
+import _CONTRACTS from '../chain/coston.json'
+import { abi as AssetManagerAbi } from '../chain/artifacts/AssetManager.json'
+import { abi as AMEAbi } from '../chain/artifacts/AMEvents.json'
 import type { OrmOptions } from './database/interface'
 
 
@@ -11,10 +11,11 @@ export interface IConfig {
   apiKey?: string
   contracts: typeof _CONTRACTS
   abis: {
-    events: any
-    assetManager: any
+    events: typeof AMEAbi
+    assetManager: typeof AssetManagerAbi
   },
-  database: OrmOptions
+  database: OrmOptions,
+  ignoreEvents?: string[]
 }
 
 export const config: IConfig = {
@@ -25,10 +26,12 @@ export const config: IConfig = {
     events: AMEAbi,
     assetManager: AssetManagerAbi
   },
-
   database: {
     driver: SqliteDriver,
     dbName: "fasset-open-beta-monitor.db",
     debug: false
-  }
+  },
+  ignoreEvents: [
+    'CurrentUnderlyingBlockUpdated'
+  ]
 }

@@ -285,9 +285,4 @@ describe("ORM: Agent", () => {
       expect(redemptionRejected.redemptionRequested.requestId).to.equal(requestId)
     }
   })
-
-  it("should test storing of liquidation from fixture", async () => {
-    await storeAgentFixture(orm, AGENT_FIXTURE)
-
-  })
 })

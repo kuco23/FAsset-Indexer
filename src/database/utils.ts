@@ -1,8 +1,9 @@
 import { MikroORM } from "@mikro-orm/core"
-import { ORM_OPTIONS } from "./mikro-orm.config"
 import { Var } from "./entities/state/var"
+import { ORM_OPTIONS } from "./mikro-orm.config"
 import type { EntityManager } from "@mikro-orm/knex"
 import type { ORM, OrmOptions, SchemaUpdate } from "./interface"
+
 
 export async function createOrm(options: OrmOptions, update: SchemaUpdate): Promise<ORM> {
   const initOptions = { ...ORM_OPTIONS, ...options }
@@ -24,18 +25,19 @@ export async function updateSchema(orm: ORM, update: SchemaUpdate = "full"): Pro
   }
 }
 
-export async function setVar(key: string, value: string, em: EntityManager) {
+export async function setVar(em: EntityManager, key: string, value?: string): Promise<void> {
+  const lastUpdate = Date.now()
   let vr = await em.findOne(Var, { key })
   if (!vr) {
-    let vr = new Var(key, value)
+    let vr = new Var(key, value, lastUpdate)
     em.persist(vr)
   } else {
     vr.value = value
+    vr.lastUpdate = lastUpdate
   }
   await em.flush()
 }
 
-export async function getVar(key: string, em: EntityManager): Promise<string | undefined> {
-  const val = await em.findOne(Var, { key })
-  return val?.value
+export async function getVar(em: EntityManager, key: string): Promise<Var | null> {
+  return await em.findOne(Var, { key })
 }

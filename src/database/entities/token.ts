@@ -3,13 +3,10 @@ import { ADDRESS_LENGTH } from "../../constants"
 
 
 @Entity()
-export class CollateralToken {
+export class VaultCollateralToken {
 
   @PrimaryKey({ type: "number", autoincrement: true })
   id!: number
-
-  @Property({ type: 'number' })
-  collateralClass: number
 
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
   address: string
@@ -27,14 +24,12 @@ export class CollateralToken {
   tokenFtsoSymbol: string
 
   constructor(
-    collateralClass: number,
     address: string,
     decimals: number,
     directPricePair: boolean,
     assetFtsoSymbol: string,
     tokenFtsoSymbol: string,
   ) {
-    this.collateralClass = collateralClass
     this.address = address
     this.decimals = decimals
     this.directPricePair = directPricePair

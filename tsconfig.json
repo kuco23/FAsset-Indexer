@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "chain/typechain/**/*.ts"],
   "exclude": ["node_modules"],
   "ts-node": {
     "swc": true,

@@ -1,5 +1,6 @@
 import { AGENT_FIXTURE } from "./agent"
 import { randomNativeAddress, randomUnderlyingAddress, randomHash } from "./utils"
+//import type { CollateralReservedEvent } from "../../chain/typechain/AssetManager"
 
 
 const COLLATERAL_RESERVED_1 = {

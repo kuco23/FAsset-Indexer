@@ -1,14 +1,22 @@
 // db variable names
-export const FIRST_UNHANDLED_EVENT_BLOCK_KEY = "firstUnhandledEventBlock"
+export const LAST_HANDLED_EVENT_BLOCK = "lastHandledEventBlock"
 
 // metadata
 export const ADDRESS_LENGTH = 42
 export const BYTES32_LENGTH = 66
 
-// event scrape data
+// chain call config
+export const CHAIN_FETCH_RETRY_LIMIT = 100
+export const MID_CHAIN_FETCH_SLEEP_MS = 250
+
+// event scrape config
 export const LOG_FETCH_SIZE = 30
-export const LOG_FETCH_SLEEP_MS = 200
-export const LOG_FETCH_RETRY_LIMIT = 100
+export const LOG_FETCH_SLEEP_MS = 60 * 1000 // collect logs every minute
+export const BLOCK_HEIGHT_OFFSET = 10
+export const MIN_BLOCK_NUMBER = 16146558
+
+// update state config
+export const STATE_UPDATE_SLEEP_MS = 2 * 60 * 1000 // collect state two minutes
 
 // event names
 export const AGENT_VAULT_CREATED = "AgentVaultCreated"
@@ -32,3 +40,5 @@ export const LIQUIDATION_ENDED = "LiquidationEnded"
 export const COLLATERAL_TYPE_ADDED = "CollateralTypeAdded"
 export const COLLATERAL_TYPE_DEPRECATED = "CollateralTypeDeprecated"
 export const AGENT_COLLATERAL_TYPE_CHANGED = "AgentCollateralTypeChanged"
+export const AVAILABLE_AGENT_EXITED = "AvailableAgentExited"
+export const AGENT_ENTERED_AVAILABLE = "AgentAvailable"

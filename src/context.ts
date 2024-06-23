@@ -1,15 +1,26 @@
-import { JsonRpcProvider, Interface, FetchRequest, Contract } from "ethers"
-import { createOrm, setVar, getVar } from "./database/utils"
+import { JsonRpcProvider, FetchRequest } from "ethers"
+import { createOrm } from "./database/utils"
+import { AssetManager__factory, AMEvents__factory, ERC20__factory } from "../chain/typechain"
 import type { IConfig } from "./config"
+import type { AssetManager, ERC20 } from "../chain/typechain"
+import type { AMEventsInterface } from "../chain/typechain/AMEvents"
+import type { ORM } from "./database/interface"
 
 
 export class Context {
   provider: JsonRpcProvider
-  assetManagerEventInterface: Interface
+  assetManagerEventInterface: AMEventsInterface
+  orm: ORM
 
-  constructor(public config: IConfig) {
+  constructor(public config: IConfig, orm: ORM) {
     this.provider = this.getEthersApiProvider(config.rpcUrl, config.apiKey)
     this.assetManagerEventInterface = this.getAssetManagerEventInterface()
+    this.orm = orm
+  }
+
+  static async create(config: IConfig): Promise<Context> {
+    const orm = await createOrm(config.database, "safe")
+    return new Context(config, orm)
   }
 
   getEthersApiProvider(rpcUrl: string, apiKey?: string): JsonRpcProvider {
@@ -20,17 +31,17 @@ export class Context {
     return new JsonRpcProvider(connection)
   }
 
-  getAssetManagerEventInterface(): Interface {
-    return new Interface(this.config.abis.events)
+  getAssetManagerEventInterface(): AMEventsInterface {
+    return AMEvents__factory.createInterface()
   }
 
-  getAssetManagerContract(fAsset: string): Contract {
+  getAssetManagerContract(fAsset: string): AssetManager {
     const contractName = `AssetManager_${fAsset}`
     const address = this.getContractAddress(contractName)
     if (address === undefined) {
       throw new Error(`Contract address not found for ${contractName}`)
     }
-    return new Contract(address, this.config.abis.assetManager, this.provider)
+    return AssetManager__factory.connect(address, this.provider)
   }
 
   getContractAddress(name: string): string | undefined {
@@ -41,19 +52,17 @@ export class Context {
   }
 
   getLogTopic(name: string): string | undefined {
-    return this.assetManagerEventInterface.getEvent(name)?.topicHash
+    return this.assetManagerEventInterface.getEvent(name as any)?.topicHash
   }
 
-  async setDbVar(key: string, value: string) {
-    const orm = await createOrm(this.config.database, "safe")
-    await setVar(key, value, orm.em.fork())
-    await orm.close()
+  ignoreLog(name: string): boolean {
+    for (const ignored of this.config.ignoreEvents ?? []) {
+      if (ignored === name) return true
+    }
+    return false
   }
 
-  async getDbVar(key: string): Promise<string | undefined> {
-    const orm = await createOrm(this.config.database, "safe")
-    const value = await getVar(key, orm.em.fork())
-    await orm.close()
-    return value
+  getERC20(address: string): ERC20 {
+    return ERC20__factory.connect(address, this.provider)
   }
 }

@@ -4,17 +4,18 @@ import { Entity, PrimaryKey, Property } from "@mikro-orm/core"
 @Entity()
 export class Var {
 
-  @PrimaryKey({ type: "number", autoincrement: true })
-  id!: number
-
-  @Property({ type: "text", unique: true })
+  @PrimaryKey({ type: "text" })
   key: string
 
-  @Property({ type: "text" })
-  value: string
+  @Property({ type: "text", nullable: true })
+  value?: string
 
-  constructor(key: string, value: string) {
+  @Property({ type: "number", nullable: true })
+  lastUpdate?: number
+
+  constructor(key: string, value?: string, lastUpdate?: number) {
     this.key = key
     this.value = value
+    this.lastUpdate = lastUpdate
   }
 }
