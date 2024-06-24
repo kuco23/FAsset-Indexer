@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core"
+import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property, OneToOne } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
@@ -70,11 +70,21 @@ export class AgentVault {
   @ManyToOne(() => AgentOwner, { fieldName: 'vaults' })
   owner: AgentOwner
 
-  constructor(address: string, underlyingAddress: string, collateralPool: string,  owner: AgentOwner) {
+  @Property({ type: 'boolean' })
+  destroyed: boolean
+
+  constructor(
+    address: string,
+    underlyingAddress: string,
+    collateralPool: string,
+    owner: AgentOwner,
+    destroyed: boolean
+  ) {
     this.address = address
     this.underlyingAddress = underlyingAddress
     this.collateralPool = collateralPool
     this.owner = owner
+    this.destroyed = destroyed
   }
 
 }

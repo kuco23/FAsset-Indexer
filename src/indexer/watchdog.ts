@@ -20,7 +20,7 @@ export class StateWatchdog {
   }
 
   async watchAgentInfo(em: EntityManager): Promise<void> {
-    const agents = await em.findAll(AgentVault)
+    const agents = await em.find(AgentVault, { destroyed: false })
     for (const agent of agents) {
       await updateAgentVaultInfo(this.context, em, agent.address)
       await sleep(MID_CHAIN_FETCH_SLEEP_MS)

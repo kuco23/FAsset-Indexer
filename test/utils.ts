@@ -12,6 +12,8 @@ import type {
 import type { ORM } from "../src/database/interface"
 import { RedemptionDefaultFixture, RedemptionPaymentBlockedFixture, RedemptionPaymentFailedFixture, RedemptionPerformedFixture, RedemptionRejectedFixture, RedemptionRequestedFixture } from "./fixtures/redemption"
 import { RedemptionDefault, RedemptionPaymentBlocked, RedemptionPaymentFailed, RedemptionPerformed, RedemptionRejected, RedemptionRequested } from "../src/database/entities/events/redemption"
+import { LiquidationStartedFixture } from "./fixtures/liquidation"
+import { LiquidationStarted } from "../src/database/entities/events/liquidation"
 
 
 export function logFixtureToEntity(log: any): EvmLog {
@@ -33,7 +35,7 @@ export function agentManagerFixtureToEntity(fixture: AgentManagerFixture): Agent
     const agentOwner = new AgentOwner(agentFixture.address, agentManager)
     agentManager.agents.add(agentOwner)
     for (const vaultFixture of agentFixture.vaults) {
-      agentOwner.vaults.add(new AgentVault(vaultFixture.address, vaultFixture.underlyingAddress, vaultFixture.collateralPool, agentOwner))
+      agentOwner.vaults.add(new AgentVault(vaultFixture.address, vaultFixture.underlyingAddress, vaultFixture.collateralPool, agentOwner, false))
     }
   }
   return agentManager
@@ -121,4 +123,12 @@ export async function redemptionPaymentFailedFixtureToEntity(
   const { requestId, failureReason, spentUnderlyingUBA, transactionHash } = fixture
   const redemptionRequested = await em.findOneOrFail(RedemptionRequested, { requestId: requestId })
   return new RedemptionPaymentFailed(evmLog, redemptionRequested, transactionHash, spentUnderlyingUBA, failureReason)
+}
+
+export async function liquidationStartedFixtureToEntity(
+  em: EntityManager, fixture: LiquidationStartedFixture, evmLog: EvmLog
+): Promise<LiquidationStarted> {
+  const { agentVault, timestamp } = fixture
+  const agentVaultEntity = await em.findOneOrFail(AgentVault, { address: agentVault })
+  return new LiquidationStarted(evmLog, agentVaultEntity, timestamp)
 }

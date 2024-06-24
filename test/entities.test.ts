@@ -25,11 +25,13 @@ import {
   redemptionPaymentDefaultFixtureToEntity,
   redemptionPaymentBlockedFixtureToEntity,
   redemptionPaymentFailedFixtureToEntity,
-  redemptionRejectedFixtureToEntity
+  redemptionRejectedFixtureToEntity,
+  liquidationStartedFixtureToEntity
 } from "./utils"
 import { randomLog } from "./fixtures/utils"
 import {
   COLLATERAL_RESERVATION_DELETED, COLLATERAL_RESERVED,
+  LIQUIDATION_STARTED,
   MINTING_EXECUTED, MINTING_PAYMENT_DEFAULT,
   REDEMPTION_DEFAULT,
   REDEMPTION_PAYMENT_BLOCKED,
@@ -42,7 +44,9 @@ import { CONFIG } from "./fixtures/config"
 import { AGENT_FIXTURE } from "./fixtures/agent"
 import { MINTING_FIXTURE } from "./fixtures/minting"
 import { REDEMPTION_FIXTURE } from "./fixtures/redemption"
+import { LIQUIDATION_FIXTURE } from "./fixtures/liquidation"
 import type { ORM } from "../src/database/interface"
+import { LiquidationStarted } from "../src/database/entities/events/liquidation"
 
 
 describe("ORM: Agent", () => {
@@ -284,5 +288,20 @@ describe("ORM: Agent", () => {
       expect(redemptionRejected).to.exist
       expect(redemptionRejected.redemptionRequested.requestId).to.equal(requestId)
     }
+  })
+
+  it("should test liquidation from entities", async () => {
+    await storeAgentFixture(orm, AGENT_FIXTURE)
+    await orm.em.transactional(async (em) => {
+      for (const liquidationStartedFixture of LIQUIDATION_FIXTURE.LIQUIDATION_STARTED) {
+        const evmLog = logFixtureToEntity(randomLog(LIQUIDATION_STARTED))
+        const liquidationStarted = await liquidationStartedFixtureToEntity(em, liquidationStartedFixture, evmLog)
+        em.persist(liquidationStarted)
+      }
+    })
+    const liquidationStarted = await orm.em.fork().findOneOrFail(LiquidationStarted, {
+      agentVault: { address: LIQUIDATION_FIXTURE.LIQUIDATION_STARTED[0].agentVault }
+    })
+    console.log(liquidationStarted)
   })
 })

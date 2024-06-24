@@ -8,3 +8,5 @@ async function runWatchdog() {
   const watchdog = new StateWatchdog(context)
   await watchdog.run()
 }
+
+runWatchdog()

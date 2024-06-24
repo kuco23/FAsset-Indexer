@@ -19,3 +19,14 @@ export class Var {
     this.lastUpdate = lastUpdate
   }
 }
+
+@Entity()
+export class UntrackedAgentVault {
+
+  @PrimaryKey({ type: "text" })
+  address: string
+
+  constructor(address: string) {
+    this.address = address
+  }
+}

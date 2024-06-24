@@ -1,20 +1,23 @@
 import { JsonRpcProvider, FetchRequest } from "ethers"
 import { createOrm } from "./database/utils"
-import { AssetManager__factory, AMEvents__factory, ERC20__factory } from "../chain/typechain"
+import { AssetManager__factory, AMEvents__factory, ERC20__factory, AgentOwnerRegistry__factory } from "../chain/typechain"
 import type { IConfig } from "./config"
 import type { AssetManager, ERC20 } from "../chain/typechain"
 import type { AMEventsInterface } from "../chain/typechain/AMEvents"
+import type { AgentOwnerRegistry } from "../chain/typechain"
 import type { ORM } from "./database/interface"
 
 
 export class Context {
   provider: JsonRpcProvider
   assetManagerEventInterface: AMEventsInterface
+  agentOwnerRegistryContract: AgentOwnerRegistry
   orm: ORM
 
   constructor(public config: IConfig, orm: ORM) {
     this.provider = this.getEthersApiProvider(config.rpcUrl, config.apiKey)
     this.assetManagerEventInterface = this.getAssetManagerEventInterface()
+    this.agentOwnerRegistryContract = this.getAgentOwnerRegistryContract()
     this.orm = orm
   }
 
@@ -35,20 +38,23 @@ export class Context {
     return AMEvents__factory.createInterface()
   }
 
+  getAgentOwnerRegistryContract(): AgentOwnerRegistry {
+    const address = this.getContractAddress("AgentOwnerRegistry")
+    return AgentOwnerRegistry__factory.connect(address, this.provider)
+  }
+
   getAssetManagerContract(fAsset: string): AssetManager {
     const contractName = `AssetManager_${fAsset}`
     const address = this.getContractAddress(contractName)
-    if (address === undefined) {
-      throw new Error(`Contract address not found for ${contractName}`)
-    }
     return AssetManager__factory.connect(address, this.provider)
   }
 
-  getContractAddress(name: string): string | undefined {
+  getContractAddress(name: string): string {
     for (const contract of this.config.contracts) {
       if (contract.name === name)
         return contract.address
     }
+    throw new Error(`Contract address not found for ${name}`)
   }
 
   getLogTopic(name: string): string | undefined {

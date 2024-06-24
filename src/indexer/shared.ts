@@ -7,7 +7,8 @@ import type { AgentInfo } from "../../chain/typechain/AssetManager"
 
 export async function updateAgentVaultInfo(context: Context, em: EntityManager, agentVault: string): Promise<void> {
   const assetManager = context.getAssetManagerContract("FTestXRP")
-  const agentVaultInfo = await assetManager.getAgentInfo(agentVault)
+  let agentVaultInfo: AgentInfo.InfoStructOutput
+  agentVaultInfo = await assetManager.getAgentInfo(agentVault)
   const agentVaultInfoEntity = await agentInfoToEntity(em, agentVaultInfo, agentVault)
   await em.persistAndFlush(agentVaultInfoEntity)
 }

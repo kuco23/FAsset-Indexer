@@ -2,7 +2,7 @@ import type { Context } from "../../context"
 import type { Filter, Log } from "ethers"
 
 
-export type EventArgs = (string & number & bigint)[]
+export type EventArgs = any[]
 
 export interface FullLog {
   name: string
@@ -57,7 +57,7 @@ export class EventScraper {
       }
       logs.push({
         name: logDescription.name,
-        args: logDescription.args as any as (string & number & bigint)[],
+        args: logDescription.args,
         blockNumber: log.blockNumber,
         transactionIndex: log.transactionIndex,
         logIndex: log.index,

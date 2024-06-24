@@ -1,6 +1,6 @@
 import { defineConfig } from "@mikro-orm/core"
 import { SqliteDriver } from "@mikro-orm/sqlite"
-import { Var } from "./entities/state/var"
+import { UntrackedAgentVault, Var } from "./entities/state/var"
 import { EvmLog } from "./entities/logs"
 import { AgentManager, AgentOwner, AgentVault } from "./entities/agent"
 import {
@@ -28,7 +28,8 @@ export const ORM_OPTIONS: Options<AbstractSqlDriver> = defineConfig({
     RedemptionRequested, RedemptionPerformed, RedemptionDefault,
     RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected,
     LiquidationStarted, LiquidationPerformed, LiquidationEnded,
-    RedemptionRequestIncomplete, AgentSettingChanged
+    RedemptionRequestIncomplete, AgentSettingChanged,
+    UntrackedAgentVault
   ],
   driver: SqliteDriver,
   dbName: "fasset-open-beta-monitor.db",
