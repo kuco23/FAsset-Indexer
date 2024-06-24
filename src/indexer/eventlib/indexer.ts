@@ -1,9 +1,9 @@
 import { sleep, retryUntilSuccess } from '../../utils'
 import { getVar, setVar } from '../../database/utils'
-import { StateUpdater } from './updater'
-import { EventScraper, type FullLog } from './scraper'
+import { StateUpdater } from './state-updater'
+import { EventScraper, type FullLog } from './event-scraper'
 import {
-  LAST_HANDLED_EVENT_BLOCK, CHAIN_FETCH_RETRY_LIMIT, LOG_FETCH_SIZE,
+  FIRST_UNHANDLED_EVENT_BLOCK, CHAIN_FETCH_RETRY_LIMIT, LOG_FETCH_SIZE,
   MID_CHAIN_FETCH_SLEEP_MS, MIN_BLOCK_NUMBER, LOG_FETCH_SLEEP_MS,
   BLOCK_HEIGHT_OFFSET
 } from '../../constants'
@@ -33,30 +33,30 @@ export class EventIndexer {
   }
 
   async runHistoric(startBlock?: number, endBlock?: number): Promise<void> {
-    const firstUnhandledBlock = await this.firstUnhandledBlock()
+    const firstUnhandledBlock = await this.getFirstUnhandledBlock()
     if (startBlock === undefined || firstUnhandledBlock > startBlock) {
       startBlock = firstUnhandledBlock
     }
     if (endBlock === undefined) {
       endBlock = await this.lastBlockToHandle()
     }
-    for (let i = startBlock; i <= endBlock; i += LOG_FETCH_SIZE) {
+    for (let i = startBlock; i <= endBlock; i += LOG_FETCH_SIZE + 1) {
       if (this.stopRequested) break
       const endLoopBlock = Math.min(endBlock, i + LOG_FETCH_SIZE)
       const logs = await this.getLogsWithRetry(i, endLoopBlock)
       await this.storeLogs(logs)
-      console.log(`Processed logs from block ${i} to block ${i + LOG_FETCH_SIZE - 1}`)
-      if (i !== endBlock) await sleep(MID_CHAIN_FETCH_SLEEP_MS)
+      console.log(`Processed logs from block ${i} to block ${endLoopBlock}`)
+      if (endLoopBlock !== endBlock) await sleep(MID_CHAIN_FETCH_SLEEP_MS)
     }
   }
 
   protected async storeLogs(logs: FullLog[]): Promise<void> {
     let lastHandledBlock: number | null = null
     for (const log of logs) {
-      await this.stateUpdater.onNewEventSafe(log)
-      if (lastHandledBlock === null || lastHandledBlock !== log.blockNumber) {
+      await this.stateUpdater.onNewEvent(log)
+      if (lastHandledBlock === null || lastHandledBlock < log.blockNumber) {
         lastHandledBlock = log.blockNumber
-        await this.setUnhandledBlock(lastHandledBlock)
+        await this.setFirstUnhandledBlock(lastHandledBlock)
       }
     }
   }
@@ -71,13 +71,13 @@ export class EventIndexer {
     return blockHeight - BLOCK_HEIGHT_OFFSET
   }
 
-  private async firstUnhandledBlock(): Promise<number> {
-    const lastBlockVar = await getVar(this.context.orm.em.fork(), LAST_HANDLED_EVENT_BLOCK)
-    return lastBlockVar !== null ? parseInt(lastBlockVar!.value!) + 1 : MIN_BLOCK_NUMBER
+  private async getFirstUnhandledBlock(): Promise<number> {
+    const firstUnhandled = await getVar(this.context.orm.em.fork(), FIRST_UNHANDLED_EVENT_BLOCK)
+    return firstUnhandled !== null ? parseInt(firstUnhandled!.value!) : MIN_BLOCK_NUMBER
   }
 
-  private async setUnhandledBlock(blockNumber: number): Promise<void> {
-    await setVar(this.context.orm.em.fork(), LAST_HANDLED_EVENT_BLOCK, blockNumber.toString())
+  private async setFirstUnhandledBlock(blockNumber: number): Promise<void> {
+    await setVar(this.context.orm.em.fork(), FIRST_UNHANDLED_EVENT_BLOCK, blockNumber.toString())
   }
 
 }

@@ -4,8 +4,8 @@
   "description": "FAsset monitor for open beta",
   "scripts": {
     "-------- runners -----------": "---------- runners ----------",
-    "run-indexer": "yarn ts-node src/indexer/run/indexer.ts",
-    "run-watchdog": "yarn ts-node src/run/watchdog.ts",
+    "run-indexer": "yarn ts-node src/run/run-indexer.ts",
+    "run-watchdog": "yarn ts-node src/run/run-watchdog.ts",
     "--------- tests -----------": "----------- tests -----------",
     "test": "yarn mocha test",
     "test-all": "yarn mocha test test/**/*.test.ts",

@@ -1,6 +1,6 @@
-import { EventIndexer } from "../eventlib/indexer"
-import { config } from "../../config"
-import { Context } from "../../context"
+import { EventIndexer } from "../indexer/eventlib/indexer"
+import { Context } from "../context"
+import { config } from "../config"
 
 async function runIndexer(start?: number) {
   const context = await Context.create(config)

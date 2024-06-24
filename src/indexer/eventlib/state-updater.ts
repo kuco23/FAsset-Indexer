@@ -1,13 +1,12 @@
 import { EntityManager, NotFoundError } from "@mikro-orm/knex"
-import { EvmLog } from "../../database/entities/logs"
 import { AgentManager, AgentOwner, AgentVault } from "../../database/entities/agent"
 import { VaultCollateralToken } from "../../database/entities/token"
-import { updateAgentVaultInfo } from "../shared"
-import { EventStorer } from "./storer"
-import type { EventArgs, FullLog } from "./scraper"
-import type { Context } from "../../context"
 import { UntrackedAgentVault } from "../../database/entities/state/var"
+import { updateAgentVaultInfo } from "../shared"
+import { EventStorer } from "./event-storer"
 import { ADDRESS_LENGTH } from "../../constants"
+import type { EventArgs, FullLog } from "./event-scraper"
+import type { Context } from "../../context"
 
 
 // binds chain reading to event storage
@@ -17,42 +16,18 @@ export class StateUpdater extends EventStorer {
     super()
   }
 
-  async onNewEventSafe(log: FullLog): Promise<void> {
-    try {
-      await this.onNewEvent(log)
-    } catch (e: any) {
-      try {
-        if (e instanceof NotFoundError) {
-          const em = this.context.orm.em.fork()
-          const matches = e.message.match(/'(0x[a-fA-F0-9]{40})'/)
-          if (matches !== null) {
-            for (const address of matches) {
-              if (await this.isUntracked(em, address)) return
-            }
-          }
-          for (const arg of log.args) {
-            if (typeof arg === 'string' && arg.startsWith('0x') && arg.length === ADDRESS_LENGTH) {
-              if (await this.isUntracked(em, arg)) return
-            }
-          }
-        }
-      } catch (f: any) {}
-      throw new Error(`unknown error ${e}`)
-    }
-  }
-
   async onNewEvent(log: FullLog): Promise<void> {
     if (this.context.ignoreLog(log.name)) return
-    await this.context.orm.em.fork().transactional(async (em) => {
-      const evmLog = await em.findOne(EvmLog, {
-        blockNumber: log.blockNumber,
-        transactionIndex: log.transactionIndex,
-        logIndex: log.logIndex
-      })
-      if (evmLog === null) {
+    try {
+      await this.context.orm.em.fork().transactional(async (em) => {
         await this.processLog(em, log)
+      })
+    } catch (e: any) {
+      if (await this.errorKindaOk(log, e)) {
+        return console.log(`ignoring error ${e} for log ${log.name}`)
       }
-    })
+      throw new Error(`unknown error ${e}`)
+    }
   }
 
   protected override async onAgentVaultCreated(em: EntityManager, args: EventArgs): Promise<AgentVault> {
@@ -129,7 +104,25 @@ export class StateUpdater extends EventStorer {
     em.persist(collateralTokenEntity)
   }
 
-  private async isUntracked(em: EntityManager, address: string): Promise<boolean> {
+  private async errorKindaOk(log: FullLog, error: any): Promise<boolean> {
+    if (error instanceof NotFoundError) {
+      const em = this.context.orm.em.fork()
+      const fullInfo = error.message + " " + log.args.filter(
+        (arg) => StateUpdater.consideredAddress(arg)).join(' ')
+      const matches = fullInfo.match(/'(0x[a-fA-F0-9]{40})'/)
+      if (matches === null) return false
+      for (const match of matches) {
+        if (await StateUpdater.isUntracked(em, match)) return true
+      }
+    }
+    return false
+  }
+
+  private static consideredAddress(arg: any): boolean {
+    return typeof arg === 'string' && arg.startsWith('0x') && arg.length === ADDRESS_LENGTH
+  }
+
+  private static async isUntracked(em: EntityManager, address: string): Promise<boolean> {
     const untracked = await em.fork().findOne(UntrackedAgentVault, { address })
     return untracked !== null
   }

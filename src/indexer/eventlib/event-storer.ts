@@ -1,6 +1,6 @@
 import { EvmLog } from "../../database/entities/logs"
 import { VaultCollateralToken } from "../../database/entities/token"
-import { AgentManager, AgentOwner, AgentVault } from "../../database/entities/agent"
+import { AgentOwner, AgentVault } from "../../database/entities/agent"
 import { AgentVaultInfo, AgentVaultSettings } from "../../database/entities/state/agent"
 import {
   CollateralReservationDeleted,
@@ -26,13 +26,25 @@ import {
   AGENT_ENTERED_AVAILABLE, AVAILABLE_AGENT_EXITED, AGENT_DESTROYED
 } from '../../constants'
 import type { EntityManager } from "@mikro-orm/knex"
-import type { FullLog, EventArgs } from "./scraper"
+import type { FullLog, EventArgs } from "./event-scraper"
 
 
 export abstract class EventStorer {
 
+  async logExists(em: EntityManager, log: FullLog): Promise<boolean> {
+    const { blockNumber, transactionIndex, logIndex } = log
+    const evmLog = await em.findOne(EvmLog, { blockNumber, transactionIndex, logIndex })
+    return evmLog !== null
+  }
+
   async processLog(em: EntityManager, log: FullLog): Promise<void> {
-    const evmLog = await this.getLogEntity(em, log)
+    if (!await this.logExists(em, log)) {
+      const evmLog = await this.createLogEntity(em, log)
+      await this.processEvent(em, log, evmLog)
+    }
+  }
+
+  async processEvent(em: EntityManager, log: FullLog, evmLog: EvmLog): Promise<void> {
     switch (log.name) {
       case AGENT_VAULT_CREATED: {
         await this.onAgentVaultCreated(em, log.args)
@@ -45,6 +57,7 @@ export abstract class EventStorer {
         break
       } case AGENT_DESTROYED: {
         await this.onAgentDestroyed(em, log.args)
+        break
       } case MINTING_EXECUTED: {
         await this.onMintingExecuted(em, evmLog, log.args)
         break
@@ -97,15 +110,6 @@ export abstract class EventStorer {
     }
   }
 
-  // assumed this is in the same orm-transaction as every other method below
-  protected async getLogEntity(em: EntityManager, log: FullLog): Promise<EvmLog> {
-    const evmLog = new EvmLog(
-      log.blockNumber, log.transactionIndex, log.logIndex,
-      log.name, log.source, log.transactionHash, log.blockTimestamp)
-    em.persist(evmLog)
-    return evmLog
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // agent
 
@@ -115,7 +119,7 @@ export abstract class EventStorer {
       feeBIPS, poolFeeShareBIPS, mintingVaultCollateralRatioBIPS, mintingPoolCollateralRatioBIPS,
       buyFAssetByAgentFactorBIPS, poolExitCollateralRatioBIPS, poolTopupCollateralRatioBIPS, poolTopupTokenPriceFactorBIPS
     ] = logArgs
-    const agentOwnerEntity = await em.findOneOrFail(AgentOwner, { manager: { address: owner }}) // todo: this may change
+    const agentOwnerEntity = await em.findOneOrFail(AgentOwner, { manager: { address: owner as string }}) // todo: this may change
     const agentVaultEntity = new AgentVault(agentVault, underlyingAddress, collateralPool, agentOwnerEntity, false)
     const vaultCollateralTokenEntity = await em.findOneOrFail(VaultCollateralToken, { address: vaultCollateralToken })
     const agentVaultSettings = new AgentVaultSettings(
@@ -287,15 +291,15 @@ export abstract class EventStorer {
   protected async onLiquidationStarted(em: EntityManager, evmLog: EvmLog, logArgs: EventArgs): Promise<void> {
     const [ agentVault, timestamp ] = logArgs
     const agentVaultEntity = await em.findOneOrFail(AgentVault, { address: agentVault })
-    const liquidationStarted = new LiquidationStarted(evmLog, agentVaultEntity, timestamp)
+    const liquidationStarted = new LiquidationStarted(evmLog, agentVaultEntity, Number(timestamp))
     em.persist(liquidationStarted)
   }
 
   protected async onFullLiquidationStarted(em: EntityManager, evmLog: EvmLog, logArgs: EventArgs): Promise<void> {
     const [ agentVault, timestamp ] = logArgs
     const agentVaultEntity = await em.findOneOrFail(AgentVault, { address: agentVault })
-    const liquidationPerformed = new FullLiquidationStarted(evmLog, agentVaultEntity, timestamp)
-    em.persist(liquidationPerformed)
+    const fullLiquidationStarted = new FullLiquidationStarted(evmLog, agentVaultEntity, Number(timestamp))
+    em.persist(fullLiquidationStarted)
   }
 
   protected async onLiquidationPerformed(em: EntityManager, evmLog: EvmLog, logArgs: EventArgs): Promise<void> {
@@ -319,6 +323,17 @@ export abstract class EventStorer {
     const [ redeemer, remainingLots ] = logArgs
     const redemptionRequestIncomplete = new RedemptionRequestIncomplete(evmLog, redeemer, remainingLots)
     em.persist(redemptionRequestIncomplete)
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  // helpers
+
+  private async createLogEntity(em: EntityManager, log: FullLog): Promise<EvmLog> {
+    const evmLog = new EvmLog(
+      log.blockNumber, log.transactionIndex, log.logIndex,
+      log.name, log.source, log.transactionHash, log.blockTimestamp)
+    em.persist(evmLog)
+    return evmLog
   }
 
 }
