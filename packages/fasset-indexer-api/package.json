@@ -1,0 +1,7 @@
+{
+    "name": "fasset-indexer-api",
+    "version": "0.0.0",
+    "description": "FAsset Indexer Api",
+    "license": "MIT",
+    "packageManager": "yarn@3.6.4"
+}

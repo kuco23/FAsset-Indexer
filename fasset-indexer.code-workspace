@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"name": "✨ fasset-bots monorepo",
+			"path": "."
+		},
+		{
+			"name": "📦 core",
+			"path": "packages/fasset-indexer-core"
+		},
+		{
+			"name": "🚀 api",
+			"path": "packages/fasset-indexer-api"
+		}
+	],
+	"settings": {
+		"yaml.customTags": [
+			"!reference sequence"
+		],
+		"search.useParentIgnoreFiles": true
+	}
+}

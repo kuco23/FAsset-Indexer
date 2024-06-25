@@ -6,7 +6,7 @@ import { AgentManager, AgentOwner, AgentVault } from "./entities/agent"
 import {
   CollateralReserved, MintingExecuted,
   MintingPaymentDefault, CollateralReservationDeleted
-} from "../database/entities/events/minting"
+} from "./entities/events/minting"
 import {
   RedemptionRequested, RedemptionPerformed, RedemptionDefault,
   RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected
