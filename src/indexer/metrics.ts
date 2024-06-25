@@ -21,7 +21,7 @@ export class EventMetrics {
 
   async totalReserved(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM collateral_reserved cr
     `)
@@ -30,7 +30,7 @@ export class EventMetrics {
 
   async totalMinted(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM minting_executed me
       INNER JOIN collateral_reserved cr ON me.collateral_reserved_collateral_reservation_id = cr.collateral_reservation_id
@@ -40,7 +40,7 @@ export class EventMetrics {
 
   async totalMintingDefaulted(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM minting_payment_default mpd
       INNER JOIN collateral_reserved cr ON mpd.collateral_reserved_collateral_reservation_id = cr.collateral_reservation_id
@@ -53,7 +53,7 @@ export class EventMetrics {
 
   async totalRedemptionRequested(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(value_uba) as totalValueUBA
       FROM redemption_requested
     `)
@@ -62,7 +62,7 @@ export class EventMetrics {
 
   async totalRedeemed(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(rr.value_uba) as totalValueUBA
       FROM redemption_requested rr
       INNER JOIN redemption_performed rp ON rp.redemption_requested_request_id = rr.request_id
@@ -72,7 +72,7 @@ export class EventMetrics {
 
   async totalRedemptionDefaulted(): Promise<bigint> {
     const em = this.context.orm.em.fork()
-    const result = await em.getConnection().execute(`
+    const result = await em.getConnection('read').execute(`
       SELECT SUM(rr.value_uba) as totalValueUBA
       FROM redemption_requested rr
       INNER JOIN redemption_default rd ON rd.redemption_requested_request_id = rr.request_id
@@ -92,11 +92,3 @@ export class EventMetrics {
     return result[0].count
   }
 }
-
-async function main() {
-  const context = await Context.create(config)
-  const eventMetrics = new EventMetrics(context)
-  console.log(await eventMetrics.totalMinted())
-}
-
-main()
