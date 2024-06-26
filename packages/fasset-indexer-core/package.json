@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "description": "FAsset Indexer Core",
     "scripts": {
+        "build": "tsc build",
         "-------- runners -----------": "---------- runners ----------",
         "run-indexer": "yarn ts-node src/run/run-indexer.ts",
         "run-watchdog": "yarn ts-node src/run/run-watchdog.ts",
@@ -20,7 +21,9 @@
         "chai": "^5.1.1",
         "fs": "^0.0.1-security",
         "mocha": "^10.4.0",
-        "tsx": "^4.15.6"
+        "ts-node": "^10.9.2",
+        "tsx": "^4.15.6",
+        "typechain": "^8.3.2"
     },
     "dependencies": {
         "@mikro-orm/cli": "^6.2.9",
@@ -29,7 +32,6 @@
         "@mikro-orm/mysql": "^6.2.9",
         "@mikro-orm/postgresql": "^6.2.9",
         "@mikro-orm/sqlite": "^6.2.9",
-        "dotenv": "^16.4.5",
         "ethers": "^6.13.0",
         "mikro-orm": "^6.2.9"
     },
@@ -39,5 +41,6 @@
             "./src/database/mikro-orm.config.ts",
             "./dist/database/mikro-orm.config.js"
         ]
-    }
+    },
+    "packageManager": "yarn@3.6.4"
 }

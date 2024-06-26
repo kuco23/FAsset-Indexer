@@ -16,7 +16,6 @@
       "skipLibCheck": true,
       "newLine": "lf"
     },
-    "include": [],
     "ts-node": {
         "files": true,
         "swc": true,

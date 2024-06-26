@@ -1,11 +1,19 @@
 {
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-      "composite": true,
-      "outDir": "./dist"
-    },
-    "include": [
-      "src/**/*",
-      "test/**/*"
-    ]
-  }
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "removeComments": true,
+    "baseUrl": "./",
+    "incremental": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ]
+}

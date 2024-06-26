@@ -6,7 +6,7 @@ export type { AgentOwnerRegistry } from "./AgentOwnerRegistry";
 export type { AssetManager } from "./AssetManager";
 export type { ERC20 } from "./ERC20";
 export * as factories from "./factories";
-export { AgentOwnerRegistry__factory } from "./factories/AgentOwnerRegistry__factory";
 export { AMEvents__factory } from "./factories/AMEvents__factory";
+export { AgentOwnerRegistry__factory } from "./factories/AgentOwnerRegistry__factory";
 export { AssetManager__factory } from "./factories/AssetManager__factory";
 export { ERC20__factory } from "./factories/ERC20__factory";
