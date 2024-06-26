@@ -6,8 +6,9 @@
       "resolveJsonModule": true
     },
     "include": [
-      "src/**/*",
-      "test/**/*",
-      "chain/**/*"
+      "src/**/*.ts",
+      "test/**/*.ts",
+      "chain/**/*.ts",
+      "chain/**/*.json"
     ]
   }

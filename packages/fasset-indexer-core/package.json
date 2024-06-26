@@ -3,10 +3,9 @@
     "version": "0.0.0",
     "description": "FAsset Indexer Core",
     "scripts": {
-        "build": "tsc build",
         "-------- runners -----------": "---------- runners ----------",
-        "run-indexer": "yarn ts-node src/run/run-indexer.ts",
-        "run-watchdog": "yarn ts-node src/run/run-watchdog.ts",
+        "run-indexer": "node dist/src/run/run-indexer.js",
+        "run-watchdog": "node dist/src/run/run-watchdog.js",
         "--------- tests -----------": "----------- tests -----------",
         "test": "yarn mocha test",
         "test-all": "yarn mocha test test/**/*.test.ts",

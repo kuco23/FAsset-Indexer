@@ -1,4 +1,4 @@
-import { StateWatchdog } from "../watchdog"
+import { StateWatchdog } from "../indexer/watchdog"
 import { Context } from "../context"
 import { config } from "../config"
 

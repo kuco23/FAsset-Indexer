@@ -1,34 +1,34 @@
 {
+  "compilerOptions": {
+    "module": "node16",
+    "target": "es2018",
+    "moduleResolution": "node16",
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "newLine": "lf"
+  },
+  "ts-node": {
+    "files": true,
+    "swc": true,
     "compilerOptions": {
-      "module": "node16",
-      "target": "es2018",
-      "moduleResolution": "node16",
-      "allowJs": true,
-      "declaration": true,
-      "declarationMap": true,
-      "strict": true,
-      "esModuleInterop": true,
-      "sourceMap": true,
-      "allowSyntheticDefaultImports": true,
-      "forceConsistentCasingInFileNames": true,
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true,
-      "skipLibCheck": true,
-      "newLine": "lf"
+      "module": "commonjs"
+    }
+  },
+  "references": [
+    {
+      "path": "packages/fasset-indexer-api"
     },
-    "ts-node": {
-        "files": true,
-        "swc": true,
-        "compilerOptions": {
-            "module": "commonjs"
-        }
-    },
-    "references": [
-      {
-        "path": "packages/fasset-indexer-core"
-      },
-      {
-        "path": "packages/fasset-indexer-api"
-      }
-    ]
-  }
+    {
+      "path": "packages/fasset-indexer-core"
+    }
+  ]
+}
