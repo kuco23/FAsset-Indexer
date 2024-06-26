@@ -2,7 +2,16 @@
     "name": "fasset-indexer-core",
     "version": "0.0.0",
     "description": "FAsset Indexer Core",
+    "private": true,
+    "license": "MIT",
+    "exports": {
+        ".": {
+            "types": "./dist/src/index.d.ts",
+            "default": "./dist/src/index.js"
+        }
+    },
     "scripts": {
+        "build": "rm -rf dist && tsc --build",
         "-------- runners -----------": "---------- runners ----------",
         "run-indexer": "node dist/src/run/run-indexer.js",
         "run-watchdog": "node dist/src/run/run-watchdog.js",
@@ -12,7 +21,6 @@
         "--------- code generators -----------": "----------- code generators -----------",
         "types": "rm -rf chain/typechain && yarn typechain --target=ethers-v6 chain/artifacts/**/*.json --out-dir chain/typechain/"
     },
-    "license": "MIT",
     "devDependencies": {
         "@typechain/ethers-v6": "^0.5.1",
         "@types/chai": "^4.3.16",

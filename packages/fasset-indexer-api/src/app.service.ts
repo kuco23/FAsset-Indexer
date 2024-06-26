@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common'
+import { EventMetrics, type Context } from 'fasset-indexer-core'
+
 
 @Injectable()
-export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+export class FAssetIndexerService extends EventMetrics {
+
+  constructor(@Inject('METRICS') context: Context) {
+    super(context)
   }
 }

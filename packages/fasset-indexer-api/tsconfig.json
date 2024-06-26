@@ -15,5 +15,10 @@
   "include": [
     "src/**/*",
     "test/**/*"
+  ],
+  "references": [
+    {
+      "path": "../fasset-indexer-core"
+    }
   ]
 }

@@ -33,7 +33,6 @@ export const ORM_OPTIONS: Options<AbstractSqlDriver> = defineConfig({
     UntrackedAgentVault
   ],
   driver: SqliteDriver,
-  dbName: "fasset-open-beta-monitor.db",
   debug: false
 })
 

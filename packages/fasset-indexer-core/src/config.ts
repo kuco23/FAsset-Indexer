@@ -1,9 +1,11 @@
 import "dotenv/config"
+import { resolve } from "path"
 import { SqliteDriver } from '@mikro-orm/sqlite'
 import _CONTRACTS from '../chain/coston.json'
 import { abi as AssetManagerAbi } from '../chain/artifacts/AssetManager.json'
 import { abi as AMEAbi } from '../chain/artifacts/AMEvents.json'
 import type { OrmOptions } from './database/interface'
+import { defineConfig } from "@mikro-orm/core"
 
 
 export interface IConfig {
@@ -18,6 +20,10 @@ export interface IConfig {
   ignoreEvents?: string[]
 }
 
+if (!process.env.DATABASE_PATH === undefined) {
+  throw new Error(".env variable `DATABASE_PATH` is required")
+}
+
 export const config: IConfig = {
   rpcUrl: "https://coston-api.flare.network/ext/C/rpc",
   apiKey: process.env.FLARE_API_KEY,
@@ -26,11 +32,11 @@ export const config: IConfig = {
     events: AMEAbi,
     assetManager: AssetManagerAbi
   },
-  database: {
+  database: defineConfig({
     driver: SqliteDriver,
-    dbName: "fasset-open-beta-monitor.db",
+    dbName: resolve(process.env.DATABASE_PATH!),
     debug: false
-  },
+  }),
   ignoreEvents: [
     'CurrentUnderlyingBlockUpdated'
   ]

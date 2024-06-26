@@ -1,8 +1,7 @@
 import { Context } from "../context"
-import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { config } from "../config"
+import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { RedemptionRequested } from "../database/entities/events/redemption"
-import { EvmLog } from "../database/entities/logs"
 
 
 export class EventMetrics {
@@ -91,4 +90,23 @@ export class EventMetrics {
     const result = await qb.count('o.minter', unique).execute()
     return result[0].count
   }
+
+  async redemptionRequestFromSecondsAgo(seconds: number): Promise<number> {
+    const timestamp = Date.now() / 1000 - seconds
+    const result = await this.context.orm.em.getConnection('read').execute(`
+      SELECT COUNT(rr.request_id) AS count
+      FROM redemption_requested rr
+      INNER JOIN evm_log el
+      ON rr.evm_log_id = el.id
+      WHERE el.timestamp >= ${timestamp}
+    `)
+    return result[0].count
+  }
+}
+
+
+async function main() {
+  const context = await Context.create(config)
+  const metrics = new EventMetrics(context)
+  console.log(await metrics.redemptionRequestFromSecondsAgo(60 * 60))
 }
