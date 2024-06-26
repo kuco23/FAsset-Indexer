@@ -10,8 +10,7 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "rootDir": "./src",
+    "noFallthroughCasesInSwitch": false
   },
   "include": [ "src/**/*" ],
   "references": [
