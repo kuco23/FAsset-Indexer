@@ -10,12 +10,10 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "rootDir": "./src",
   },
-  "include": [
-    "src/**/*",
-    "test/**/*"
-  ],
+  "include": [ "src/**/*" ],
   "references": [
     {
       "path": "../fasset-indexer-core"

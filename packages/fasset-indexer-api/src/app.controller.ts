@@ -25,4 +25,19 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.redemptionRequestFromSecondsAgo(seconds).then(String), 200)
   }
 
+  @Get('/total-minting-defaulted')
+  getTotalMintingDefaulted(): Promise<ApiResponse<string>> {
+    return apiResponse(this.appService.totalMintingDefaulted().then(String), 200)
+  }
+
+  @Get('/total-redemption-requested')
+  getTotalRedemptionRequested(): Promise<ApiResponse<string>> {
+    return apiResponse(this.appService.totalRedemptionRequested().then(String), 200)
+  }
+
+  @Get('/total-redeemed')
+  getTotalRedeemed(): Promise<ApiResponse<string>> {
+    return apiResponse(this.appService.totalRedeemed().then(String), 200)
+  }
+
 }

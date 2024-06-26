@@ -53,3 +53,5 @@ secrets.json
 *playground.ts
 
 /**/node_modules
+
+*tsbuildinfo
