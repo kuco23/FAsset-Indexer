@@ -13,7 +13,8 @@
   },
   "scripts": {
     "clean": "rimraf -g dist \"packages/*/dist\"",
-    "build": "yarn clean && tsc --build",
+    "build-api": "cd packages/fasset-indexer-api && yarn build",
+    "build": "yarn clean && tsc --build && yarn build-api",
     "lint": "eslint --ignore-path .gitignore ."
   },
   "license": "MIT",
