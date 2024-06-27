@@ -1,7 +1,9 @@
-import { Context } from "../context"
-import { config } from "../config"
+import { getVar } from "../database/utils"
 import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { RedemptionRequested } from "../database/entities/events/redemption"
+import { Context } from "../context"
+import { config } from "../config"
+import { FIRST_UNHANDLED_EVENT_BLOCK } from "../constants"
 
 
 export class EventMetrics {
@@ -13,6 +15,14 @@ export class EventMetrics {
     qb.select('o').where({ poolFeeUBA: null })
     const result = await qb.count('o', true).execute()
     return result[0].count
+  }
+
+  ///////////////////////////////////////////////////////////////
+  // metadata
+
+  async currentBlock(): Promise<number | null> {
+    const v = await getVar(this.context.orm.em.fork(), FIRST_UNHANDLED_EVENT_BLOCK)
+    return (v && v.value) ? parseInt(v.value) : null
   }
 
   //////////////////////////////////////////////////////////////

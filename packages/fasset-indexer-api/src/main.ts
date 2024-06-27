@@ -1,6 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { FAssetIndexerModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet'
+import { NestFactory } from '@nestjs/core'
+import { FAssetIndexerModule } from './app.module'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+
 
 async function bootstrap() {
   const app = await NestFactory.create(FAssetIndexerModule)
@@ -8,11 +10,10 @@ async function bootstrap() {
     .setTitle('FAsset Indexer')
     .setDescription('Indexer for the FAsset protocol')
     .setVersion('1.0')
-    .addTag('minting')
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
-  await app.listen(3000)
+  await app.use(helmet()).listen(3000)
 }
 
 bootstrap()

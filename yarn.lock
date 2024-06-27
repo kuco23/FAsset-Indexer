@@ -3154,6 +3154,7 @@ __metadata:
     "@types/node": ^20.3.1
     "@types/supertest": ^6.0.0
     fasset-indexer-core: "workspace:*"
+    helmet: ^7.1.0
     reflect-metadata: ^0.2.0
     rxjs: ^7.8.1
     source-map-support: ^0.5.21
@@ -3846,6 +3847,13 @@ __metadata:
   bin:
     he: bin/he
   checksum: 3d4d6babccccd79c5c5a3f929a68af33360d6445587d628087f39a965079d84f18ce9c3d3f917ee1e3978916fc833bb8b29377c3b403f919426f91bc6965e7a7
+  languageName: node
+  linkType: hard
+
+"helmet@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "helmet@npm:7.1.0"
+  checksum: 16aaa0df997eaa18821e71389bc9ceffeeaa935df98427ede2bb006065f7e02bb1941caabea16d5a93a791cb3fe7d8a760266bc57b3b9ca5dd7da17ea84244b8
   languageName: node
   linkType: hard
 

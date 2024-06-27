@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { FAssetIndexerService } from './app.service';
+import { FAssetIndexerService } from './app.service'
 import { FAssetIndexerController } from './app.controller'
-import { config, Context } from 'fasset-indexer-core';
+import { config, Context } from 'fasset-indexer-core'
 
 
 const fAssetIndexerServiceProvider = {

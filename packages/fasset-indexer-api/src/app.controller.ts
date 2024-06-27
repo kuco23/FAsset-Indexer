@@ -10,6 +10,11 @@ export class FAssetIndexerController {
 
   constructor(private readonly appService: FAssetIndexerService) {}
 
+  @Get('/current-block')
+  getCurrentBlock(): Promise<ApiResponse<number | null>> {
+    return apiResponse(this.appService.currentBlock(), 200)
+  }
+
   @Get('/total-minted')
   getTotalMinted(): Promise<ApiResponse<string>> {
     return apiResponse(this.appService.totalMinted().then(String), 200)
@@ -21,8 +26,8 @@ export class FAssetIndexerController {
   }
 
   @Get('/redemption-requests/:seconds')
-  getRedemptionRequests(@Param('seconds') seconds: number): Promise<ApiResponse<string>> {
-    return apiResponse(this.appService.redemptionRequestFromSecondsAgo(seconds).then(String), 200)
+  getRedemptionRequests(@Param('seconds') seconds: number): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.redemptionRequestFromSecondsAgo(seconds), 200)
   }
 
   @Get('/total-minting-defaulted')
