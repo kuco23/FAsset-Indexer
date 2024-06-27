@@ -6,7 +6,7 @@ Wants = network-online.target
 [Service]
 Type = exec
 ExecStart = /usr/bin/node dist/src/run/run-indexer.js
-WorkingDirectory = /home/ubuntu/fasset-indexer/packages/fasset-indexer-core
+WorkingDirectory = /home/ubuntu/FAsset-Indexer/packages/fasset-indexer-core
 Restart = always
 RestartSec = 10
 StandardOutput = journal
