@@ -1,17 +1,17 @@
 [Unit]
-Description = FAsset Indexer Core
+Description = FAsset Indexer Api
 After = network-online.target
 Wants = network-online.target
 
 [Service]
 Type = exec
 ExecStart = /usr/bin/node dist/src/main
-WorkingDirectory = /home/ubuntu/fasset-indexer/packages/fasset-indexer-core
+WorkingDirectory = /home/ubuntu/fasset-indexer/packages/fasset-indexer-api
 Restart = always
 RestartSec = 10
 StandardOutput = journal
 StandardError = journal
-SyslogIdentifier = fasset-indexer-core
+SyslogIdentifier = fasset-indexer-api
 User = ubuntu
 Group = ubuntu
 Environment = LANG=C.UTF-8 SHELL=/bin/bash
