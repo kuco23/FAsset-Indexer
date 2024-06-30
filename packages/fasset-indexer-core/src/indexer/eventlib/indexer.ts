@@ -45,6 +45,7 @@ export class EventIndexer {
       const endLoopBlock = Math.min(endBlock, i + LOG_FETCH_SIZE)
       const logs = await this.getLogsWithRetry(i, endLoopBlock)
       await this.storeLogs(logs)
+      await this.setFirstUnhandledBlock(endLoopBlock + 1)
       console.log(`Processed logs from block ${i} to block ${endLoopBlock}`)
       if (endLoopBlock !== endBlock) await sleep(MID_CHAIN_FETCH_SLEEP_MS)
     }

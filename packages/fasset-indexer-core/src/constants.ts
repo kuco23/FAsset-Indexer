@@ -1,12 +1,5 @@
-// db variable names
-export const FIRST_UNHANDLED_EVENT_BLOCK = "lastHandledEventBlock"
-
-// metadata
-export const ADDRESS_LENGTH = 42
-export const BYTES32_LENGTH = 66
-
 // chain call config
-export const CHAIN_FETCH_RETRY_LIMIT = 100
+export const CHAIN_FETCH_RETRY_LIMIT = 20
 export const MID_CHAIN_FETCH_SLEEP_MS = 250
 
 // event scrape config
@@ -17,6 +10,12 @@ export const MIN_BLOCK_NUMBER = 16152107
 
 // update state config
 export const STATE_UPDATE_SLEEP_MS = 2 * 60 * 1000 // collect state two minutes
+
+// db settings
+export const MAX_DATABASE_ENTRIES_FETCH = 100
+
+// db variable names
+export const FIRST_UNHANDLED_EVENT_BLOCK = "lastHandledEventBlock"
 
 // event names
 // agent
@@ -47,3 +46,7 @@ export const LIQUIDATION_ENDED = "LiquidationEnded"
 export const COLLATERAL_TYPE_ADDED = "CollateralTypeAdded"
 export const COLLATERAL_TYPE_DEPRECATED = "CollateralTypeDeprecated"
 export const AGENT_COLLATERAL_TYPE_CHANGED = "AgentCollateralTypeChanged"
+
+// metadata
+export const ADDRESS_LENGTH = 42
+export const BYTES32_LENGTH = 66

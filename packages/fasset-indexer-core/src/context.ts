@@ -26,23 +26,6 @@ export class Context {
     return new Context(config, orm)
   }
 
-  getEthersApiProvider(rpcUrl: string, apiKey?: string): JsonRpcProvider {
-    const connection = new FetchRequest(rpcUrl)
-    if (apiKey !== undefined) {
-      connection.setHeader('x-api-key', apiKey)
-    }
-    return new JsonRpcProvider(connection)
-  }
-
-  getAssetManagerEventInterface(): AMEventsInterface {
-    return AMEvents__factory.createInterface()
-  }
-
-  getAgentOwnerRegistryContract(): AgentOwnerRegistry {
-    const address = this.getContractAddress("AgentOwnerRegistry")
-    return AgentOwnerRegistry__factory.connect(address, this.provider)
-  }
-
   getAssetManagerContract(fAsset: string): AssetManager {
     const contractName = `AssetManager_${fAsset}`
     const address = this.getContractAddress(contractName)
@@ -70,5 +53,22 @@ export class Context {
 
   getERC20(address: string): ERC20 {
     return ERC20__factory.connect(address, this.provider)
+  }
+
+  private getEthersApiProvider(rpcUrl: string, apiKey?: string): JsonRpcProvider {
+    const connection = new FetchRequest(rpcUrl)
+    if (apiKey !== undefined) {
+      connection.setHeader('x-api-key', apiKey)
+    }
+    return new JsonRpcProvider(connection)
+  }
+
+  private getAssetManagerEventInterface(): AMEventsInterface {
+    return AMEvents__factory.createInterface()
+  }
+
+  private getAgentOwnerRegistryContract(): AgentOwnerRegistry {
+    const address = this.getContractAddress("AgentOwnerRegistry")
+    return AgentOwnerRegistry__factory.connect(address, this.provider)
   }
 }

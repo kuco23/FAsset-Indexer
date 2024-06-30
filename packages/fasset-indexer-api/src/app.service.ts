@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common'
-import { EventMetrics, type Context } from 'fasset-indexer-core'
+import { Analytics, type ORM } from 'fasset-indexer-core'
 
 
 @Injectable()
-export class FAssetIndexerService extends EventMetrics {
+export class FAssetIndexerService extends Analytics {
 
-  constructor(@Inject('CONTEXT') context: Context) {
-    super(context)
+  constructor(@Inject('ORM') orm: ORM) {
+    super(orm)
   }
 }

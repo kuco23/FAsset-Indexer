@@ -1,17 +1,23 @@
-import { getVar } from "../database/utils"
+import { createOrm, getVar } from "../database/utils"
 import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { RedemptionRequested } from "../database/entities/events/redemption"
-import { Context } from "../context"
+import { FIRST_UNHANDLED_EVENT_BLOCK, MAX_DATABASE_ENTRIES_FETCH } from "../constants"
+import { FullLiquidationStarted, LiquidationPerformed } from "../database/entities/events/liquidation"
+import type { OrmOptions, ORM } from "../database/interface"
 import { config } from "../config"
-import { FIRST_UNHANDLED_EVENT_BLOCK } from "../constants"
 
 
-export class EventMetrics {
+export class Analytics {
 
-  constructor(public readonly context: Context) {}
+  constructor(public readonly orm: ORM) {}
+
+  static async create(path: OrmOptions) {
+    const orm = await createOrm(path, "safe")
+    return new Analytics(orm)
+  }
 
   async unhandledMintings(): Promise<number> {
-    const qb = this.context.orm.em.qb(MintingExecuted, 'o')
+    const qb = this.orm.em.qb(MintingExecuted, 'o')
     qb.select('o').where({ poolFeeUBA: null })
     const result = await qb.count('o', true).execute()
     return result[0].count
@@ -21,7 +27,7 @@ export class EventMetrics {
   // metadata
 
   async currentBlock(): Promise<number | null> {
-    const v = await getVar(this.context.orm.em.fork(), FIRST_UNHANDLED_EVENT_BLOCK)
+    const v = await getVar(this.orm.em.fork(), FIRST_UNHANDLED_EVENT_BLOCK)
     return (v && v.value) ? parseInt(v.value) : null
   }
 
@@ -29,7 +35,7 @@ export class EventMetrics {
   // mintings
 
   async totalReserved(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM collateral_reserved cr
@@ -38,7 +44,7 @@ export class EventMetrics {
   }
 
   async totalMinted(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM minting_executed me
@@ -48,7 +54,7 @@ export class EventMetrics {
   }
 
   async totalMintingDefaulted(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(cr.value_uba) as totalValueUBA
       FROM minting_payment_default mpd
@@ -61,7 +67,7 @@ export class EventMetrics {
   // redemptions
 
   async totalRedemptionRequested(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(value_uba) as totalValueUBA
       FROM redemption_requested
@@ -70,7 +76,7 @@ export class EventMetrics {
   }
 
   async totalRedeemed(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(rr.value_uba) as totalValueUBA
       FROM redemption_requested rr
@@ -80,7 +86,7 @@ export class EventMetrics {
   }
 
   async totalRedemptionDefaulted(): Promise<bigint> {
-    const em = this.context.orm.em.fork()
+    const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(rr.value_uba) as totalValueUBA
       FROM redemption_requested rr
@@ -90,20 +96,20 @@ export class EventMetrics {
   }
 
   async totalRedemptionRequesters(unique: boolean): Promise<number> {
-    const qb = this.context.orm.em.qb(RedemptionRequested, 'o')
+    const qb = this.orm.em.qb(RedemptionRequested, 'o')
     const result = await qb.count('o.redeemer', unique).execute()
     return result[0].count
   }
 
   async totalCollateralReservers(unique: boolean): Promise<number> {
-    const qb = this.context.orm.em.qb(CollateralReserved, 'o')
+    const qb = this.orm.em.qb(CollateralReserved, 'o')
     const result = await qb.count('o.minter', unique).execute()
     return result[0].count
   }
 
   async redemptionRequestFromSecondsAgo(seconds: number): Promise<number> {
     const timestamp = Date.now() / 1000 - seconds
-    const result = await this.context.orm.em.getConnection('read').execute(`
+    const result = await this.orm.em.getConnection('read').execute(`
       SELECT COUNT(rr.request_id) AS count
       FROM redemption_requested rr
       INNER JOIN evm_log el
@@ -112,11 +118,20 @@ export class EventMetrics {
     `)
     return result[0].count
   }
+
+  async fullLiquidations(): Promise<FullLiquidationStarted[]> {
+    return this.orm.em.fork().findAll(FullLiquidationStarted,
+      { populate: ['agentVault'], limit: MAX_DATABASE_ENTRIES_FETCH })
+  }
+
+  async liquidations(): Promise<LiquidationPerformed[]> {
+    return this.orm.em.fork().findAll(LiquidationPerformed,
+      { populate: ['agentVault'], limit: MAX_DATABASE_ENTRIES_FETCH })
+  }
 }
 
 
 async function main() {
-  const context = await Context.create(config)
-  const metrics = new EventMetrics(context)
+  const metrics = await Analytics.create(config.database)
   console.log(await metrics.redemptionRequestFromSecondsAgo(60 * 60))
 }
