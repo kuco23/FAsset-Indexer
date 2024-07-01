@@ -78,6 +78,7 @@ export class FAssetIndexerController {
 
   @Get('/agent-minting-executed-count?')
   getAgentMintingExecutedCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    console.log(agent)
     return apiResponse(this.appService.agentMintingExecutedCount(agent), 200)
   }
 

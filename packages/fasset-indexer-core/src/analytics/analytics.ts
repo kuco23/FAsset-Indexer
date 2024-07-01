@@ -140,23 +140,32 @@ export class Analytics {
   ////////////////////////////////////////////////////////////////////
   // agent specific (liquidation count, mint count, redeem count, percent of successful redemptions
 
+  async agentCollateralReservationCount(agentAddress: string): Promise<number> {
+    const qb = this.orm.em.fork().qb(CollateralReserved, 'o')
+    qb.select('o.collateral_reservation_id').where({ agentVault: { address: agentAddress }})
+    const result = await qb.count('o.collateral_reservation_id').execute()
+    return result[0].count
+  }
+
   async agentMintingExecutedCount(agentAddress: string): Promise<number> {
     const qb = this.orm.em.fork().qb(MintingExecuted, 'o')
-    qb.select('o.collateral_reserved_collateral_reservation_id').where({ collateralReserved: { agentVault: agentAddress }})
+    qb.select('o.collateral_reserved_collateral_reservation_id')
+      .where({ collateralReserved: { agentVault: { address: agentAddress }}})
     const result = await qb.count('o.collateral_reserved_collateral_reservation_id').execute()
     return result[0].count
   }
 
   async agentRedemptionRequestCount(agentAddress: string): Promise<number> {
     const qb = this.orm.em.fork().qb(RedemptionRequested, 'o')
-    qb.select('o.request_id').where({ redeemer: agentAddress })
+    qb.select('o.request_id').where({ agentVault: { address: agentAddress }})
     const result = await qb.count('o.request_id').execute()
     return result[0].count
   }
 
   async agentRedemptionPerformedCount(agentAddress: string): Promise<number> {
     const qb = this.orm.em.fork().qb(RedemptionPerformed, 'o')
-    qb.select('o.redemption_requested_request_id').where({ redemptionRequested: { agentVault: agentAddress }})
+    qb.select('o.redemption_requested_request_id')
+      .where({ redemptionRequested: { agentVault: { address: agentAddress }}})
     const result = await qb.count('o.redemption_requested_request_id').execute()
     return result[0].count
   }
@@ -169,8 +178,8 @@ export class Analytics {
 
   async agentLiquidationCount(agentAddress: string): Promise<number> {
     const qb = this.orm.em.fork().qb(LiquidationPerformed, 'o')
-    qb.select('o').where({ liquidator: agentAddress, valueUBA: { $gt: 0 } })
-    const result = await qb.count('o', true).execute()
+    qb.select('o.id').where({ agentVault: { address: agentAddress }, valueUBA: { $gt: 0 } })
+    const result = await qb.count('o.id').execute()
     return result[0].count
   }
 
@@ -181,7 +190,7 @@ export class Analytics {
 
 }
 
-async function main() {
+/* async function main() {
   const metrics = await Analytics.create(config.database)
-  console.log(await metrics.redemptionRequestFromSecondsAgo(60 * 60))
-}
+  console.log(await metrics.agentCollateralReservationCount('0x62d65025A7A1602dD14f58A6d68535046539Db72'))
+} */
