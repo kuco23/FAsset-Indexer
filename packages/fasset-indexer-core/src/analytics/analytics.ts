@@ -1,8 +1,8 @@
 import { createOrm, getVar } from "../database/utils"
 import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { RedemptionRequested } from "../database/entities/events/redemption"
-import { FIRST_UNHANDLED_EVENT_BLOCK, MAX_DATABASE_ENTRIES_FETCH } from "../constants"
 import { FullLiquidationStarted, LiquidationPerformed } from "../database/entities/events/liquidation"
+import { FIRST_UNHANDLED_EVENT_BLOCK, MAX_DATABASE_ENTRIES_FETCH } from "../constants"
 import type { OrmOptions, ORM } from "../database/interface"
 import { config } from "../config"
 
@@ -125,8 +125,10 @@ export class Analytics {
   }
 
   async liquidations(): Promise<LiquidationPerformed[]> {
-    return this.orm.em.fork().findAll(LiquidationPerformed,
-      { populate: ['agentVault'], limit: MAX_DATABASE_ENTRIES_FETCH })
+    return this.orm.em.fork().find(LiquidationPerformed,
+      { valueUBA: { $gt: 0 } },
+      { populate: ['agentVault'], limit: MAX_DATABASE_ENTRIES_FETCH }
+    )
   }
 }
 

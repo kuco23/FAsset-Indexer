@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core"
+import { Entity, ManyToOne, OneToOne, PrimaryKey, Property } from "@mikro-orm/core"
 import { EvmLog, EventBound } from "../logs"
 import { ADDRESS_LENGTH } from "../../../constants"
 import { AgentVault } from "../agent"
@@ -43,5 +43,17 @@ export class AgentSettingChanged extends EventBound {
     this.agentVault = agentVault
     this.name = name
     this.value = value
+  }
+}
+
+@Entity()
+export class AgentVaultCreated extends EventBound {
+
+  @OneToOne({ entity: () => AgentVault, primary: true, owner: true })
+  agentVault: AgentVault
+
+  constructor(evmLog: EvmLog, agentVault: AgentVault) {
+    super(evmLog)
+    this.agentVault = agentVault
   }
 }

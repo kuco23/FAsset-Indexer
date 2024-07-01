@@ -15,7 +15,7 @@ import {
   FullLiquidationStarted, LiquidationEnded, LiquidationPerformed, LiquidationStarted
 } from "../../database/entities/events/liquidation"
 import {
-  AgentSettingChanged, RedemptionRequestIncomplete
+  AgentSettingChanged, AgentVaultCreated, RedemptionRequestIncomplete
 } from "../../database/entities/events/tracking"
 import {
   AGENT_VAULT_CREATED, AGENT_SETTING_CHANGED,
@@ -47,7 +47,7 @@ export abstract class EventStorer {
   async processEvent(em: EntityManager, log: FullLog, evmLog: EvmLog): Promise<void> {
     switch (log.name) {
       case AGENT_VAULT_CREATED: {
-        await this.onAgentVaultCreated(em, log.args)
+        await this.onAgentVaultCreated(em, evmLog, log.args)
         break
       } case AGENT_SETTING_CHANGED: {
         await this.onAgentSettingChanged(em, evmLog, log.args)
@@ -113,7 +113,7 @@ export abstract class EventStorer {
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   // agent
 
-  protected async onAgentVaultCreated(em: EntityManager, logArgs: EventArgs): Promise<AgentVault> {
+  protected async onAgentVaultCreated(em: EntityManager, evmLog: EvmLog, logArgs: EventArgs): Promise<AgentVault> {
     const [
       owner, agentVault, collateralPool, underlyingAddress, vaultCollateralToken,
       feeBIPS, poolFeeShareBIPS, mintingVaultCollateralRatioBIPS, mintingPoolCollateralRatioBIPS,
@@ -121,6 +121,7 @@ export abstract class EventStorer {
     ] = logArgs
     const agentOwnerEntity = await em.findOneOrFail(AgentOwner, { manager: { address: owner as string }}) // todo: this may change
     const agentVaultEntity = new AgentVault(agentVault, underlyingAddress, collateralPool, agentOwnerEntity, false)
+    const agentVaultCreated = new AgentVaultCreated(evmLog, agentVaultEntity)
     const vaultCollateralTokenEntity = await em.findOneOrFail(VaultCollateralToken, { address: vaultCollateralToken })
     const agentVaultSettings = new AgentVaultSettings(
       agentVaultEntity, vaultCollateralTokenEntity, feeBIPS, poolFeeShareBIPS, mintingVaultCollateralRatioBIPS,

@@ -7,6 +7,7 @@ import { EventStorer } from "./event-storer"
 import { ADDRESS_LENGTH } from "../../constants"
 import type { EventArgs, FullLog } from "./event-scraper"
 import type { Context } from "../../context"
+import type { EvmLog } from "../../database/entities/logs"
 
 
 // binds chain reading to event storage
@@ -30,12 +31,12 @@ export class StateUpdater extends EventStorer {
     }
   }
 
-  protected override async onAgentVaultCreated(em: EntityManager, args: EventArgs): Promise<AgentVault> {
+  protected override async onAgentVaultCreated(em: EntityManager, evmLog: EvmLog, args: EventArgs): Promise<AgentVault> {
     const [ owner,,,, vaultCollateralToken ] = args
     await this.ensureStoredCollateralToken(em, vaultCollateralToken)
     const manager = await this.ensureAgentManager(em, owner)
     await this.ensureAgentOwner(em, manager)
-    const agentVaultEntity = await super.onAgentVaultCreated(em, args)
+    const agentVaultEntity = await super.onAgentVaultCreated(em, evmLog, args)
     await this.updateAgentVaultInfo(em, agentVaultEntity)
     return agentVaultEntity
   }
@@ -112,7 +113,8 @@ export class StateUpdater extends EventStorer {
       const matches = fullInfo.match(/'(0x[a-fA-F0-9]{40})'/)
       if (matches === null) return false
       for (const match of matches) {
-        if (await StateUpdater.isUntracked(em, match)) return true
+        if (await StateUpdater.isUntracked(em, match))
+          return true
       }
     }
     return false

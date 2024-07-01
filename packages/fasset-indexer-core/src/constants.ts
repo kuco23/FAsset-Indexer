@@ -12,7 +12,7 @@ export const MIN_BLOCK_NUMBER = 16152107
 export const STATE_UPDATE_SLEEP_MS = 2 * 60 * 1000 // collect state two minutes
 
 // db settings
-export const MAX_DATABASE_ENTRIES_FETCH = 100
+export const MAX_DATABASE_ENTRIES_FETCH = 200
 
 // db variable names
 export const FIRST_UNHANDLED_EVENT_BLOCK = "lastHandledEventBlock"

@@ -12,18 +12,20 @@ export class StateWatchdog {
 
   async run(): Promise<void> {
     while (true) {
-      await this.context.orm.connect()
       await this.watchAgentInfo(this.context.orm.em.fork())
       await sleep(STATE_UPDATE_SLEEP_MS)
-      await this.context.orm.close()
     }
   }
 
   async watchAgentInfo(em: EntityManager): Promise<void> {
     const agents = await em.find(AgentVault, { destroyed: false })
     for (const agent of agents) {
-      await updateAgentVaultInfo(this.context, em, agent.address)
-      await sleep(MID_CHAIN_FETCH_SLEEP_MS)
+      try {
+        await updateAgentVaultInfo(this.context, em, agent.address)
+        await sleep(MID_CHAIN_FETCH_SLEEP_MS)
+      } catch (e: any) {
+        console.error(`error updating agent info for ${agent.address}: ${e}`)
+      }
     }
   }
 

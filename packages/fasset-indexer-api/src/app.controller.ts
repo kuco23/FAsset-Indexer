@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FAssetIndexerService } from './app.service'
 import { apiResponse, type ApiResponse } from './common/api-response'
+import type { LiquidationPerformed, FullLiquidationStarted } from 'fasset-indexer-core'
 
 
 @ApiTags("Indexer")
@@ -43,6 +44,16 @@ export class FAssetIndexerController {
   @Get('/total-redeemed')
   getTotalRedeemed(): Promise<ApiResponse<string>> {
     return apiResponse(this.appService.totalRedeemed().then(String), 200)
+  }
+
+  @Get('/liquidations')
+  getPerformedLiquidations(): Promise<ApiResponse<LiquidationPerformed[]>> {
+    return apiResponse(this.appService.liquidations(), 200)
+  }
+
+  @Get('/full-liquidations')
+  getFullLiquidations(): Promise<ApiResponse<FullLiquidationStarted[]>> {
+    return apiResponse(this.appService.fullLiquidations(), 200)
   }
 
 }
