@@ -9,7 +9,7 @@ export const BLOCK_HEIGHT_OFFSET = 20
 export const MIN_BLOCK_NUMBER = 16152107
 
 // update state config
-export const STATE_UPDATE_SLEEP_MS = 2 * 60 * 1000 // collect state two minutes
+export const STATE_UPDATE_SLEEP_MS = 1 * 60 * 1000 // collect state every one minute
 
 // db settings
 export const MAX_DATABASE_ENTRIES_FETCH = 200

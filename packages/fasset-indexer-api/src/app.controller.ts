@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FAssetIndexerService } from './app.service'
 import { apiResponse, type ApiResponse } from './common/api-response'
@@ -26,7 +26,7 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.totalReserved().then(String), 200)
   }
 
-  @Get('/redemption-requests/:seconds')
+  @Get('/redemption-requests?:seconds')
   getRedemptionRequests(@Param('seconds') seconds: number): Promise<ApiResponse<number>> {
     return apiResponse(this.appService.redemptionRequestFromSecondsAgo(seconds), 200)
   }
@@ -46,6 +46,18 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.totalRedeemed().then(String), 200)
   }
 
+  @Get('/total-redemption-requesters')
+  getTotalRedemptionRequesters(): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.totalRedemptionRequesters(), 200)
+  }
+
+  @Get('/total-collateral-reservers')
+  getTotalCollateralReservers(): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.totalCollateralReservers(), 200)
+  }
+
+  // Liquidations
+
   @Get('/liquidations')
   getPerformedLiquidations(): Promise<ApiResponse<LiquidationPerformed[]>> {
     return apiResponse(this.appService.liquidations(), 200)
@@ -56,4 +68,36 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.fullLiquidations(), 200)
   }
 
+  @Get('/liquidators')
+  getLiquidators(): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.totalLiquidators(), 200)
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // agents
+
+  @Get('/agent-minting-executed-count?')
+  getAgentMintingExecutedCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.agentMintingExecutedCount(agent), 200)
+  }
+
+  @Get('/agent-redemption-request-count?')
+  getAgentRedemptionRequestCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.agentRedemptionRequestCount(agent), 200)
+  }
+
+  @Get('/agent-redemption-performed-count?')
+  getAgentRedemptionPerformedCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.agentRedemptionPerformedCount(agent), 200)
+  }
+
+  @Get('/agent-redemption-success-rate?')
+  getAgentRedemptionSuccessRate(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.agentRedemptionSuccessRate(agent), 200)
+  }
+
+  @Get('/agent-liquidation-count?')
+  getAgentLiquidationCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.agentLiquidationCount(agent), 200)
+  }
 }
