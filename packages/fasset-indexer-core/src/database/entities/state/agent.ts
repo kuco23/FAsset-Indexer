@@ -1,4 +1,4 @@
-import { Entity, Property, ManyToOne, BigIntType, OneToOne, PrimaryKey } from '@mikro-orm/core'
+import { Entity, Property, ManyToOne, BigIntType, OneToOne } from '@mikro-orm/core'
 import { AgentVault } from '../agent'
 import { VaultCollateralToken } from '../token'
 

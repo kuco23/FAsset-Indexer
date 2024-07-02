@@ -26,9 +26,9 @@ export async function updateSchema(orm: ORM, update: SchemaUpdate = "full"): Pro
 }
 
 export async function setVar(em: EntityManager, key: string, value?: string): Promise<void> {
-  let vr = await em.findOne(Var, { key })
+  const vr = await em.findOne(Var, { key })
   if (!vr) {
-    let vr = new Var(key, value)
+    const vr = new Var(key, value)
     em.persist(vr)
   } else {
     vr.value = value

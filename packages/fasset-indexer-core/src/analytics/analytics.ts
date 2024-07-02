@@ -4,7 +4,6 @@ import { RedemptionPerformed, RedemptionRequested } from "../database/entities/e
 import { FullLiquidationStarted, LiquidationPerformed } from "../database/entities/events/liquidation"
 import { FIRST_UNHANDLED_EVENT_BLOCK, MAX_DATABASE_ENTRIES_FETCH } from "../constants"
 import type { OrmOptions, ORM } from "../database/interface"
-import { config } from "../config"
 
 
 export class Analytics {

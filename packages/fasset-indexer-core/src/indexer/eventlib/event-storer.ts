@@ -102,8 +102,10 @@ export abstract class EventStorer {
         break
       } case AVAILABLE_AGENT_EXITED: {
         await this.onAvailableAgentExited(em, log.args)
+        break
       } case AGENT_ENTERED_AVAILABLE: {
         await this.onAgentEnteredAvailable(em, log.args)
+        break
       } default: {
         break
       }

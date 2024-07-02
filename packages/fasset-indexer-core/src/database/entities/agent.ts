@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property, OneToOne } from "@mikro-orm/core"
+import { Cascade, Collection, Entity, OneToMany, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
