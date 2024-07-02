@@ -14,9 +14,6 @@
 		}
 	],
 	"settings": {
-		"yaml.customTags": [
-			"!reference sequence"
-		],
 		"search.useParentIgnoreFiles": true
 	}
 }

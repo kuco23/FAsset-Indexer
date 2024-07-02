@@ -50,7 +50,7 @@ export class EventScraper {
       if (blockTimestamp === null || lastBlockNumber !== log.blockNumber) {
         const block = await this.context.provider.getBlock(log.blockNumber)
         if (block === null) {
-          throw new Error("Failed to fetch block")
+          throw new Error(`Failed to fetch block ${log.blockNumber}`)
         }
         blockTimestamp = block.timestamp
         lastBlockNumber = log.blockNumber

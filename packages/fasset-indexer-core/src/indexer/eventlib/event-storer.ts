@@ -121,14 +121,14 @@ export abstract class EventStorer {
     ] = logArgs
     const agentOwnerEntity = await em.findOneOrFail(AgentOwner, { manager: { address: owner as string }}) // todo: this may change
     const agentVaultEntity = new AgentVault(agentVault, underlyingAddress, collateralPool, agentOwnerEntity, false)
-    const agentVaultCreated = new AgentVaultCreated(evmLog, agentVaultEntity)
     const vaultCollateralTokenEntity = await em.findOneOrFail(VaultCollateralToken, { address: vaultCollateralToken })
     const agentVaultSettings = new AgentVaultSettings(
       agentVaultEntity, vaultCollateralTokenEntity, feeBIPS, poolFeeShareBIPS, mintingVaultCollateralRatioBIPS,
       mintingPoolCollateralRatioBIPS, buyFAssetByAgentFactorBIPS, poolExitCollateralRatioBIPS,
       poolTopupCollateralRatioBIPS, poolTopupTokenPriceFactorBIPS
     )
-    em.persist([agentVaultEntity, agentVaultSettings])
+    const agentVaultCreated = new AgentVaultCreated(evmLog, agentVaultEntity)
+    em.persist([agentVaultEntity, agentVaultSettings, agentVaultCreated])
     return agentVaultEntity
   }
 

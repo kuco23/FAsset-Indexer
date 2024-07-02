@@ -1,4 +1,4 @@
-# Run agent as a `systemd` Service
+# Run fasset indexer as a `systemd` Service
 
 All the examples are for the `fasset-indexer` service.
 
