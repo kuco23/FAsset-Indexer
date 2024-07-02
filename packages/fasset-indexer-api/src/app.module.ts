@@ -7,7 +7,7 @@ import { config, createOrm } from 'fasset-indexer-core'
 const fAssetIndexerServiceProvider = {
   provide: FAssetIndexerService,
   useFactory: async () => {
-    const orm = await createOrm(config.database, 'safe')
+    const orm = await createOrm(config.db, 'safe')
     return new FAssetIndexerService(orm)
   }
 }

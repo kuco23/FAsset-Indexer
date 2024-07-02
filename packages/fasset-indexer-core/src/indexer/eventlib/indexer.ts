@@ -13,20 +13,14 @@ import type { Context } from '../../context'
 export class EventIndexer {
   readonly eventScraper: EventScraper
   readonly stateUpdater: StateUpdater
-  private stopRequested: boolean = false
 
   constructor(public readonly context: Context) {
     this.eventScraper = new EventScraper(context)
     this.stateUpdater = new StateUpdater(context)
   }
 
-  requestStop(): void {
-    this.stopRequested = true
-  }
-
   async run(startBlock?: number): Promise<void> {
     while (true) {
-      if (this.stopRequested) break
       await this.runHistoric(startBlock)
       await sleep(LOG_FETCH_SLEEP_MS)
     }
@@ -41,7 +35,6 @@ export class EventIndexer {
       endBlock = await this.lastBlockToHandle()
     }
     for (let i = startBlock; i <= endBlock; i += LOG_FETCH_SIZE + 1) {
-      if (this.stopRequested) break
       const endLoopBlock = Math.min(endBlock, i + LOG_FETCH_SIZE)
       const logs = await this.getLogsWithRetry(i, endLoopBlock)
       await this.storeLogs(logs)

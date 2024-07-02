@@ -53,12 +53,12 @@ describe("ORM: Agent", () => {
   let orm: ORM
 
   beforeEach(async () => {
-    orm = await createOrm(CONFIG.database, "safe")
+    orm = await createOrm(CONFIG.db, "safe")
   })
 
   afterEach(async () => {
     await orm.close()
-    unlink(resolve(CONFIG.database.dbName!), () => {})
+    unlink(resolve(CONFIG.db.name!), () => {})
   })
 
   it("should test storing agent managers/owners/vaults from fixtures", async () => {

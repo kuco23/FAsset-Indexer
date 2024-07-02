@@ -10,13 +10,9 @@ export class Var {
   @Property({ type: "text", nullable: true })
   value?: string
 
-  @Property({ type: "number", nullable: true })
-  lastUpdate?: number
-
-  constructor(key: string, value?: string, lastUpdate?: number) {
+  constructor(key: string, value?: string) {
     this.key = key
     this.value = value
-    this.lastUpdate = lastUpdate
   }
 }
 

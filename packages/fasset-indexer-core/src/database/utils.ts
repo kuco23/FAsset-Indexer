@@ -26,14 +26,12 @@ export async function updateSchema(orm: ORM, update: SchemaUpdate = "full"): Pro
 }
 
 export async function setVar(em: EntityManager, key: string, value?: string): Promise<void> {
-  const lastUpdate = Date.now()
   let vr = await em.findOne(Var, { key })
   if (!vr) {
-    let vr = new Var(key, value, lastUpdate)
+    let vr = new Var(key, value)
     em.persist(vr)
   } else {
     vr.value = value
-    vr.lastUpdate = lastUpdate
   }
   await em.flush()
 }

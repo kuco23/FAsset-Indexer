@@ -1,5 +1,4 @@
 import { defineConfig } from "@mikro-orm/core"
-import { SqliteDriver } from "@mikro-orm/sqlite"
 import { UntrackedAgentVault, Var } from "./entities/state/var"
 import { EvmLog } from "./entities/logs"
 import { AgentManager, AgentOwner, AgentVault } from "./entities/agent"
@@ -15,7 +14,9 @@ import {
   FullLiquidationStarted, LiquidationEnded,
   LiquidationPerformed, LiquidationStarted
 } from "./entities/events/liquidation"
-import { RedemptionRequestIncomplete, AgentSettingChanged } from "./entities/events/tracking"
+import {
+  RedemptionRequestIncomplete, AgentSettingChanged, AgentVaultCreated
+} from "./entities/events/tracking"
 import { AgentVaultInfo, AgentVaultSettings } from "./entities/state/agent"
 import type { Options } from "@mikro-orm/core"
 import type { AbstractSqlDriver } from "@mikro-orm/knex"
@@ -24,7 +25,7 @@ import type { AbstractSqlDriver } from "@mikro-orm/knex"
 export const ORM_OPTIONS: Options<AbstractSqlDriver> = defineConfig({
   entities: [
     Var, EvmLog,
-    AgentManager, AgentOwner, AgentVault, AgentVaultSettings, AgentVaultInfo,
+    AgentManager, AgentOwner, AgentVault, AgentVaultSettings, AgentVaultInfo, AgentVaultCreated,
     CollateralReserved, MintingExecuted, MintingPaymentDefault, CollateralReservationDeleted,
     RedemptionRequested, RedemptionPerformed, RedemptionDefault,
     RedemptionPaymentFailed, RedemptionPaymentBlocked, RedemptionRejected,
@@ -32,7 +33,6 @@ export const ORM_OPTIONS: Options<AbstractSqlDriver> = defineConfig({
     RedemptionRequestIncomplete, AgentSettingChanged,
     UntrackedAgentVault
   ],
-  driver: SqliteDriver,
   debug: false
 })
 

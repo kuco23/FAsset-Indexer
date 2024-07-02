@@ -2,6 +2,8 @@
 Description = FAsset Indexer Api
 After = network-online.target
 Wants = network-online.target
+After=postgresql.service
+Wants=postgresql.service
 
 [Service]
 Type = exec

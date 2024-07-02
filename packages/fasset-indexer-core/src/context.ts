@@ -15,14 +15,14 @@ export class Context {
   orm: ORM
 
   constructor(public config: IConfig, orm: ORM) {
-    this.provider = this.getEthersApiProvider(config.rpcUrl, config.apiKey)
+    this.provider = this.getEthersApiProvider(config.rpc.url, config.rpc.apiKey)
     this.assetManagerEventInterface = this.getAssetManagerEventInterface()
     this.agentOwnerRegistryContract = this.getAgentOwnerRegistryContract()
     this.orm = orm
   }
 
   static async create(config: IConfig): Promise<Context> {
-    const orm = await createOrm(config.database, "safe")
+    const orm = await createOrm(config.db, "safe")
     return new Context(config, orm)
   }
 
@@ -33,7 +33,7 @@ export class Context {
   }
 
   getContractAddress(name: string): string {
-    for (const contract of this.config.contracts) {
+    for (const contract of this.config.contracts.addresses) {
       if (contract.name === name)
         return contract.address
     }
