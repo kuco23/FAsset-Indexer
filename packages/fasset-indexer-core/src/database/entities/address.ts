@@ -2,7 +2,7 @@ import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core"
 import { ADDRESS_LENGTH } from "../../constants"
 
 
-export enum AddressType { USER, AGENT, SYSTEM }
+export enum AddressType { USER, AGENT, SYSTEM, SERVICE }
 
 @Entity()
 export class EvmAddress {
@@ -11,13 +11,13 @@ export class EvmAddress {
   id!: number
 
   @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
-  address: string
+  hex: string
 
   @Enum(() => AddressType)
   type: AddressType
 
   constructor(address: string, type: AddressType) {
-    this.address = address
+    this.hex = address
     this.type = type
   }
 }
@@ -29,13 +29,13 @@ export class UnderlyingAddress {
   id!: number
 
   @Property({ type: 'text', unique: true })
-  address: string
+  text: string
 
   @Enum(() => AddressType)
   type: AddressType
 
-  constructor(address: string, type: AddressType) {
-    this.address = address
+  constructor(text: string, type: AddressType) {
+    this.text = text
     this.type = type
   }
 }

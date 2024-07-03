@@ -1,4 +1,5 @@
-import { Entity, ManyToOne, PrimaryKey, Property, BigIntType, OneToOne } from "@mikro-orm/core"
+import { Entity, ManyToOne, PrimaryKey, Property, OneToOne } from "@mikro-orm/core"
+import { uint256 } from "../../custom/typeUint256"
 import { EvmAddress, UnderlyingAddress } from "../address"
 import { AgentVault } from "../agent"
 import { EvmLog, EventBound } from "../logs"
@@ -20,10 +21,10 @@ export class RedemptionRequested extends EventBound {
   @ManyToOne({ entity: () => UnderlyingAddress })
   paymentAddress: UnderlyingAddress
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   valueUBA: bigint
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   feeUBA: bigint
 
   @Property({ type: 'number' })
@@ -41,7 +42,7 @@ export class RedemptionRequested extends EventBound {
   @ManyToOne({ entity: () => EvmAddress })
   executor: EvmAddress
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   executorFeeNatWei: bigint
 
   constructor(
@@ -84,7 +85,7 @@ export class RedemptionPerformed extends EventBound {
   @Property({ type: 'text', length: BYTES32_LENGTH, unique: true })
   transactionHash: string
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   spentUnderlyingUBA: bigint
 
   constructor(
@@ -106,10 +107,10 @@ export class RedemptionDefault extends EventBound {
   @OneToOne({ primary: true, owner: true, entity: () => RedemptionRequested })
   redemptionRequested: RedemptionRequested
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   redeemedVaultCollateralWei: bigint
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   redeemedPoolCollateralWei: bigint
 
   constructor(
@@ -146,7 +147,7 @@ export class RedemptionPaymentBlocked extends EventBound {
   @Property({ type: 'text', length: BYTES32_LENGTH })
   transactionHash: string
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   spentUnderlyingUBA: bigint
 
   constructor(
@@ -171,7 +172,7 @@ export class RedemptionPaymentFailed extends EventBound {
   @Property({ type: 'text', length: BYTES32_LENGTH })
   transactionHash: string
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   spentUnderlyingUBA: bigint
 
   @Property({ type: 'text' })

@@ -1,4 +1,5 @@
-import { Entity, Property, ManyToOne, PrimaryKey, BigIntType, OneToOne } from '@mikro-orm/core'
+import { Entity, Property, ManyToOne, PrimaryKey, OneToOne } from '@mikro-orm/core'
+import { uint256 } from '../../custom/typeUint256'
 import { EvmAddress, UnderlyingAddress } from '../address'
 import { EvmLog, EventBound } from '../logs'
 import { AgentVault } from '../agent'
@@ -17,10 +18,10 @@ export class CollateralReserved extends EventBound {
   @ManyToOne({ entity: () => EvmAddress })
   minter: EvmAddress
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   valueUBA: bigint
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   feeUBA: bigint
 
   @Property({ type: 'number' })
@@ -41,7 +42,7 @@ export class CollateralReserved extends EventBound {
   @ManyToOne({ entity: () => EvmAddress })
   executor: EvmAddress
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   executorFeeNatWei: bigint
 
   constructor(
@@ -81,7 +82,7 @@ export class MintingExecuted extends EventBound {
   @OneToOne({ primary: true, owner: true, entity: () => CollateralReserved })
   collateralReserved: CollateralReserved
 
-  @Property({ type: new BigIntType('bigint') })
+  @Property({ type: new uint256() })
   poolFeeUBA: bigint
 
   constructor(evmLog: EvmLog, collateralReserved: CollateralReserved, poolFeeUBA: bigint) {

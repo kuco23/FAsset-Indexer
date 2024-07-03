@@ -1,4 +1,5 @@
 import { Entity, PrimaryKey, ManyToOne, Property } from '@mikro-orm/core'
+import { uint256 } from '../../custom/typeUint256'
 import { EventBound } from '../logs'
 import { AgentVault } from '../agent'
 import { EvmAddress } from '../address'
@@ -41,10 +42,10 @@ export class LiquidationPerformed extends EventBound {
   @ManyToOne({ entity: () => EvmAddress })
   liquidator: EvmAddress
 
-  @Property({ type: 'number' })
-  valueUBA: number
+  @Property({ type: new uint256() })
+  valueUBA: bigint
 
-  constructor(evmLog: EvmLog, agentVault: AgentVault, liquidator: EvmAddress, valueUBA: number) {
+  constructor(evmLog: EvmLog, agentVault: AgentVault, liquidator: EvmAddress, valueUBA: bigint) {
     super(evmLog)
     this.agentVault = agentVault
     this.liquidator = liquidator
