@@ -138,4 +138,16 @@ export class FAssetIndexerController {
     const now = Math.floor(Date.now() / 1000)
     return apiResponse(this.appService.redemptionPerformedChartData(now - history, now, step), 200)
   }
+
+  @Get('/redemption-requests-by-executor-chart-data')
+  getRedemptionRequestsByExecutorChartData(
+    @Query('executor') executor: string,
+    @Query('historySeconds') history: number,
+    @Query('stepSeconds') step: number
+  ): Promise<ApiResponse<ChartData>> {
+    history = Number(history)
+    step = Number(step)
+    const now = Math.floor(Date.now() / 1000)
+    return apiResponse(this.appService.redemptionRequestsWithExecutorChartData(executor, now - history, now, step), 200)
+  }
 }

@@ -21,13 +21,6 @@ export class Analytics {
     return new Analytics(orm)
   }
 
-  async unhandledMintings(): Promise<number> {
-    const qb = this.orm.em.qb(MintingExecuted, 'o')
-    qb.select('o').where({ poolFeeUBA: null })
-    const result = await qb.count('o', true).execute()
-    return result[0].count
-  }
-
   ///////////////////////////////////////////////////////////////
   // metadata
 
@@ -188,6 +181,15 @@ export class Analytics {
     return result[0].count
   }
 
+  ////////////////////////////////////////////////////////////////////
+  // executor
+
+  async executorRedemptionRequests(executor: string): Promise<number> {
+    const qb = this.orm.em.fork().qb(RedemptionRequested, 'o')
+    qb.select('o.request_id').where({ executor })
+    const result = await qb.count('o.request_id').execute()
+    return result[0].count
+  }
 
   //////////////////////////////////////////////////////////////////////
   // user specific
@@ -207,20 +209,20 @@ export class Analytics {
     return this.entityCountChartData(RedemptionRequested, start, end, step)
   }
 
-  private async entityCountChartData(entity: any, start: number, end: number, step: number): Promise<ChartData> {
+  async redemptionRequestsWithExecutorChartData(executor: string, start: number, end: number, step: number): Promise<ChartData> {
+    return this.entityCountChartData(RedemptionRequested, start, end, step, { executor })
+  }
+
+  private async entityCountChartData(entity: any, start: number, end: number, step: number, where?: any): Promise<ChartData> {
     const data: ChartData = []
     const qb = this.orm.em.fork().qb(entity, 'o')
     for (let s = start; s < end; s += step) {
       const result = await qb.clone()
         .select('o.evmLog')
-        .where({ evmLog: { timestamp: { $gte: s, $lt: s + step }}})
+        .where({ evmLog: { timestamp: { $gte: s, $lt: s + step }}, ...where})
         .count()
         .execute()
-      data.push({
-        count: result[0].count,
-        start: s,
-        end: s + step
-      })
+      data.push({ count: result[0].count, start: s, end: s + step })
     }
     return data
   }
@@ -230,7 +232,7 @@ export class Analytics {
 /* import { config } from "../config"
 async function main() {
   const metrics = await Analytics.create(config.db)
-  console.log(await metrics.redemptionRequestChartData(1716400417, 1720000417, 10 * 3600))
+  console.log(await metrics.redemptionRequestsWithExecutorChartData('0x0048508b510502555ed47e98de98dd6426ddd0c4', 1716400417, 1720000417, 10 * 3600))
   await metrics.orm.close()
 }
 
