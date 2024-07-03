@@ -1,7 +1,8 @@
 import { Entity, Property, ManyToOne, PrimaryKey, BigIntType, OneToOne } from '@mikro-orm/core'
+import { EvmAddress, UnderlyingAddress } from '../address'
 import { EvmLog, EventBound } from '../logs'
 import { AgentVault } from '../agent'
-import { ADDRESS_LENGTH, BYTES32_LENGTH } from '../../../constants'
+import { BYTES32_LENGTH } from '../../../constants'
 
 
 @Entity()
@@ -13,8 +14,8 @@ export class CollateralReserved extends EventBound {
   @ManyToOne({ entity: () => AgentVault })
   agentVault: AgentVault
 
-  @Property({ type: 'text', length: ADDRESS_LENGTH })
-  minter: string
+  @ManyToOne({ entity: () => EvmAddress })
+  minter: EvmAddress
 
   @Property({ type: new BigIntType('bigint') })
   valueUBA: bigint
@@ -31,14 +32,14 @@ export class CollateralReserved extends EventBound {
   @Property({ type: 'number' })
   lastUnderlyingTimestamp: number
 
-  @Property({ type: 'text' })
-  paymentAddress: string
+  @ManyToOne({ entity: () => UnderlyingAddress})
+  paymentAddress: UnderlyingAddress
 
   @Property({ type: 'text', length: BYTES32_LENGTH, unique: true })
   paymentReference: string
 
-  @Property({ type: 'text', length: ADDRESS_LENGTH })
-  executor: string
+  @ManyToOne({ entity: () => EvmAddress })
+  executor: EvmAddress
 
   @Property({ type: new BigIntType('bigint') })
   executorFeeNatWei: bigint
@@ -47,15 +48,15 @@ export class CollateralReserved extends EventBound {
     evmLog: EvmLog,
     collateralReservationId: number,
     agentVault: AgentVault,
-    minter: string,
+    minter: EvmAddress,
     valueUBA: bigint,
     feeUBA: bigint,
     firstUnderlyingBlock: number,
     lastUnderlyingBlock: number,
     lastUnderlyingTimestamp: number,
-    paymentAddress: string,
+    paymentAddress: UnderlyingAddress,
     paymentReference: string,
-    executor: string,
+    executor: EvmAddress,
     executorFeeNatWei: bigint
   ) {
     super(evmLog)

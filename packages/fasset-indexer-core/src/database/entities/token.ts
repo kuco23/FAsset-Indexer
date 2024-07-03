@@ -1,14 +1,11 @@
-import { Entity, Property, PrimaryKey } from "@mikro-orm/core"
-import { ADDRESS_LENGTH } from "../../constants"
+import { Entity, Property, OneToOne } from "@mikro-orm/core"
+import { EvmAddress } from "./address"
 
 
 @Entity()
 export class VaultCollateralToken {
 
-  @PrimaryKey({ type: "number", autoincrement: true })
-  id!: number
-
-  @Property({ type: 'text', length: ADDRESS_LENGTH, unique: true })
+  @OneToOne({ entity: () => EvmAddress, owner: true, primary: true })
   address: string
 
   @Property({ type: 'number' })
