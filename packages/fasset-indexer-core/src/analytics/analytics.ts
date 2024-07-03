@@ -1,10 +1,16 @@
 import { createOrm, getVar } from "../database/utils"
 import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
-import { RedemptionPerformed, RedemptionRequested } from "../database/entities/events/redemption"
+import { RedemptionDefault, RedemptionPerformed, RedemptionRequested } from "../database/entities/events/redemption"
 import { FullLiquidationStarted, LiquidationPerformed } from "../database/entities/events/liquidation"
 import { FIRST_UNHANDLED_EVENT_BLOCK, MAX_DATABASE_ENTRIES_FETCH } from "../constants"
 import type { OrmOptions, ORM } from "../database/interface"
 
+
+export type ChartData = {
+  count: number
+  start: number
+  end: number
+}[]
 
 export class Analytics {
 
@@ -186,10 +192,46 @@ export class Analytics {
   //////////////////////////////////////////////////////////////////////
   // user specific
 
+  //////////////////////////////////////////////////////////////////////
+  // custom
+
+  async redemptionDefaultChartData(start: number, end: number, step: number): Promise<ChartData> {
+    return this.entityCountChartData(RedemptionDefault, start, end, step)
+  }
+
+  async redemptionPerformedChartData(start: number, end: number, step: number): Promise<ChartData> {
+    return this.entityCountChartData(RedemptionPerformed, start, end, step)
+  }
+
+  async redemptionRequestChartData(start: number, end: number, step: number): Promise<ChartData> {
+    return this.entityCountChartData(RedemptionRequested, start, end, step)
+  }
+
+  private async entityCountChartData(entity: any, start: number, end: number, step: number): Promise<ChartData> {
+    const data: ChartData = []
+    const qb = this.orm.em.fork().qb(entity, 'o')
+    for (let s = start; s < end; s += step) {
+      const result = await qb.clone()
+        .select('o.evmLog')
+        .where({ evmLog: { timestamp: { $gte: s, $lt: s + step }}})
+        .count()
+        .execute()
+      data.push({
+        count: result[0].count,
+        start: s,
+        end: s + step
+      })
+    }
+    return data
+  }
 
 }
 
-/* async function main() {
-  const metrics = await Analytics.create(config.database)
-  console.log(await metrics.agentCollateralReservationCount('0x62d65025A7A1602dD14f58A6d68535046539Db72'))
-} */
+/* import { config } from "../config"
+async function main() {
+  const metrics = await Analytics.create(config.db)
+  console.log(await metrics.redemptionRequestChartData(1716400417, 1720000417, 10 * 3600))
+  await metrics.orm.close()
+}
+
+main() */

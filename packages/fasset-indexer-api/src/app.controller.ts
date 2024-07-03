@@ -2,7 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FAssetIndexerService } from './app.service'
 import { apiResponse, type ApiResponse } from './common/api-response'
-import type { LiquidationPerformed, FullLiquidationStarted } from 'fasset-indexer-core'
+import type { LiquidationPerformed, FullLiquidationStarted, ChartData } from 'fasset-indexer-core'
+import { exit } from 'process'
 
 
 @ApiTags("Indexer")
@@ -26,8 +27,8 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.totalReserved().then(String), 200)
   }
 
-  @Get('/redemption-requests?:seconds')
-  getRedemptionRequests(@Param('seconds') seconds: number): Promise<ApiResponse<number>> {
+  @Get('/redemption-requests?')
+  getRedemptionRequests(@Query('seconds') seconds: number): Promise<ApiResponse<number>> {
     return apiResponse(this.appService.redemptionRequestFromSecondsAgo(seconds), 200)
   }
 
@@ -100,5 +101,41 @@ export class FAssetIndexerController {
   @Get('/agent-liquidation-count?')
   getAgentLiquidationCount(@Query('agent') agent: string): Promise<ApiResponse<number>> {
     return apiResponse(this.appService.agentLiquidationCount(agent), 200)
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // custom
+
+  @Get('/redemption-request-count-chart-data?')
+  getRedemptionRequestCountChartData(
+    @Query('historySeconds') history: number,
+    @Query('stepSeconds') step: number
+  ): Promise<ApiResponse<ChartData>> {
+    const now = Math.floor(Date.now() / 1000)
+    history = Number(history)
+    step = Number(step)
+    return apiResponse(this.appService.redemptionRequestChartData(now - history, now, step), 200)
+  }
+
+  @Get('/redemption-default-count-chart-data?')
+  getRedemptionDefaultCountChartData(
+    @Query('historySeconds') history: number,
+    @Query('stepSeconds') step: number
+  ): Promise<ApiResponse<ChartData>> {
+    history = Number(history)
+    step = Number(step)
+    const now = Math.floor(Date.now() / 1000)
+    return apiResponse(this.appService.redemptionDefaultChartData(now - history, now, step), 200)
+  }
+
+  @Get('/redemption-performed-count-chart-data?')
+  getRedemptionPerformedCountChartData(
+    @Query('historySeconds') history: number,
+    @Query('stepSeconds') step: number
+  ): Promise<ApiResponse<ChartData>> {
+    history = Number(history)
+    step = Number(step)
+    const now = Math.floor(Date.now() / 1000)
+    return apiResponse(this.appService.redemptionPerformedChartData(now - history, now, step), 200)
   }
 }
