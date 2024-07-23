@@ -198,6 +198,12 @@ export class Analytics {
     return result[0].count
   }
 
+  async totalMintingExecutions(): Promise<number> {
+    const qb = this.orm.em.fork().qb(MintingExecuted, 'o')
+    const result = await qb.count('o.collateral_reserved_collateral_reservation_id').execute()
+    return result[0].count
+  }
+
   //////////////////////////////////////////////////////////////////////
   // user specific
 
