@@ -193,7 +193,7 @@ export class Analytics {
 
   async executorMintingPerformed(executor: string): Promise<number> {
     const qb = this.orm.em.fork().qb(MintingExecuted, 'o')
-    qb.select('o.id').where({ collateralReserved: { executor }})
+    qb.select('o.collateral_reserved_collateral_reservation_id').where({ collateralReserved: { executor }})
     const result = await qb.count('o.id').execute()
     return result[0].count
   }
