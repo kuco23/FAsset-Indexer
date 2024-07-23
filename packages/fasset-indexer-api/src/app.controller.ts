@@ -103,6 +103,11 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.agentLiquidationCount(agent), 200)
   }
 
+  @Get('/minting-executed-with-executor?')
+  mintingExecutedWithExecutor(@Query('executor') executor: string): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.executorMintingPerformed(executor), 200)
+  }
+
   ////////////////////////////////////////////////////////////////////////////
   // custom
 
