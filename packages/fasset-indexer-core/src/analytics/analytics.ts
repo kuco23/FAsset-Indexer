@@ -201,7 +201,7 @@ export class Analytics {
   async totalFreeLots(): Promise<bigint> {
     const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
-      SELECT SUM(value_uba) as total
+      SELECT SUM(free_collateral_lots) as total
       FROM agent_vault_info
       WHERE publicly_available = TRUE
     `)

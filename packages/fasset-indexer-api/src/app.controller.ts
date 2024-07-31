@@ -150,4 +150,22 @@ export class FAssetIndexerController {
     const now = Math.floor(Date.now() / 1000)
     return apiResponse(this.appService.redemptionRequestsWithExecutorChartData(executor, now - history, now, step), 200)
   }
+
+  @Get('/events-per-second?')
+  getEventsPerSecond(@Query('seconds') seconds: number): Promise<ApiResponse<number>> {
+    return apiResponse(this.appService.eventsPer(seconds), 200)
+  }
+
+  @Get('/total-free-lots')
+  getTotalFreeLots(): Promise<ApiResponse<string>> {
+    return apiResponse(this.appService.totalFreeLots().then(String), 200)
+  }
+
+  @Get('/agents-in-liquidation')
+  getAgentsInLiquidation(): Promise<ApiResponse<{ totalAgents: number, agentsInLiquidation: number }>> {
+    return apiResponse(this.appService.agentsInLiquidation().then(x => ({
+      totalAgents: x[1],
+      agentsInLiquidation: x[0]
+    })), 200)
+  }
 }
