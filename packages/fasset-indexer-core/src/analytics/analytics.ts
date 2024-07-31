@@ -191,6 +191,19 @@ export class Analytics {
     return result[0].count
   }
 
+  async executorMintingPerformed(executor: string): Promise<number> {
+    const qb = this.orm.em.fork().qb(MintingExecuted, 'o')
+    qb.select('o.collateral_reserved_collateral_reservation_id').where({ collateralReserved: { executor }})
+    const result = await qb.count('o.collateral_reserved_collateral_reservation_id').execute()
+    return result[0].count
+  }
+
+  async totalMintingExecutions(): Promise<number> {
+    const qb = this.orm.em.fork().qb(MintingExecuted, 'o')
+    const result = await qb.count('o.collateral_reserved_collateral_reservation_id').execute()
+    return result[0].count
+  }
+
   //////////////////////////////////////////////////////////////////////
   // user specific
 
@@ -235,6 +248,10 @@ export class Analytics {
 
   async redemptionRequestsWithExecutorChartData(executor: string, start: number, end: number, step: number): Promise<ChartData> {
     return this.entityCountChartData(RedemptionRequested, start, end, step, { executor })
+  }
+
+  async mintRequestsWithExecutorChartData(executor: string, start: number, end: number, step: number): Promise<ChartData> {
+    return this.entityCountChartData(MintingExecuted, start, end, step, { collateralReserved: { executor }})
   }
 
   private async entityCountChartData(entity: any, start: number, end: number, step: number, where?: any): Promise<ChartData> {
