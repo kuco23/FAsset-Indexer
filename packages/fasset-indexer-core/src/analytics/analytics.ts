@@ -194,6 +194,30 @@ export class Analytics {
   //////////////////////////////////////////////////////////////////////
   // user specific
 
+
+  ////////////////////////////////////////////////////////////////////
+  // system health
+
+  async totalFreeLots(): Promise<bigint> {
+    const em = this.orm.em.fork()
+    const result = await em.getConnection('read').execute(`
+      SELECT SUM(value_uba) as total
+      FROM agent_vault_info
+      WHERE publicly_available = TRUE
+    `)
+    return result[0].total
+  }
+
+  async agentsInLiquidation(): Promise<[number, number]> {
+    const nAgentsInLiquidation = await this.orm.em.fork().count(AgentVaultInfo, { status: 2 })
+    const nAgents = await this.orm.em.fork().count(AgentVaultInfo)
+    return [nAgentsInLiquidation, nAgents]
+  }
+
+  async eventsPer(seconds: number = 60): Promise<number> {
+    return this.orm.em.fork().count(EvmLog, { timestamp: { $gt: Date.now() / 1000 - seconds }})
+  }
+
   //////////////////////////////////////////////////////////////////////
   // custom
 
@@ -229,11 +253,13 @@ export class Analytics {
 
 }
 
-/* import { config } from "../config"
+import { config } from "../config"
+import { AgentVaultInfo } from "../database/entities/state/agent"
+import { EvmLog } from "../database/entities/logs"
 async function main() {
   const metrics = await Analytics.create(config.db)
-  console.log(await metrics.redemptionRequestsWithExecutorChartData('0x0048508b510502555ed47e98de98dd6426ddd0c4', 1716400417, 1720000417, 10 * 3600))
+  console.log(await metrics.eventsPer())
   await metrics.orm.close()
 }
 
-main() */
+main()
