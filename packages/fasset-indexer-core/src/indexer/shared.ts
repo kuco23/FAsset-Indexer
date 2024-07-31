@@ -9,7 +9,7 @@ export async function updateAgentVaultInfo(context: Context, em: EntityManager, 
   const assetManager = context.getAssetManagerContract("FTestXRP")
   let agentVaultInfo: AgentInfo.InfoStructOutput = await assetManager.getAgentInfo(agentVault)
   const agentVaultInfoEntity = await agentInfoToEntity(em, agentVaultInfo, agentVault)
-  await em.persistAndFlush(agentVaultInfoEntity)
+  await em.upsert(agentVaultInfoEntity)
 }
 
 async function agentInfoToEntity(em: EntityManager, agentInfo: AgentInfo.InfoStructOutput, vaultAddress: string): Promise<AgentVaultInfo> {
