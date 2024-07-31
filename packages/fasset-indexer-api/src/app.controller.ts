@@ -161,9 +161,9 @@ export class FAssetIndexerController {
     return apiResponse(this.appService.redemptionRequestsWithExecutorChartData(executor, now - history, now, step), 200)
   }
 
-  @Get('/events-per-second?')
+  @Get('/events-per-interval?')
   getEventsPerSecond(@Query('seconds') seconds: number): Promise<ApiResponse<number>> {
-    return apiResponse(this.appService.eventsPer(seconds), 200)
+    return apiResponse(this.appService.eventsPerInterval(seconds), 200)
   }
 
   @Get('/total-free-lots')

@@ -214,9 +214,10 @@ export class Analytics {
   async totalFreeLots(): Promise<bigint> {
     const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
-      SELECT SUM(free_collateral_lots) as total
-      FROM agent_vault_info
-      WHERE publicly_available = TRUE
+      SELECT SUM(avi.free_collateral_lots) as total
+      FROM agent_vault_info avi
+      INNER JOIN agent_vault av ON avi.agent_vault_id = av.id
+      WHERE avi.publicly_available = TRUE AND av.destroyed = FALSE
     `)
     return result[0].total
   }
@@ -227,7 +228,7 @@ export class Analytics {
     return [nAgentsInLiquidation, nAgents]
   }
 
-  async eventsPer(seconds: number = 60): Promise<number> {
+  async eventsPerInterval(seconds: number = 60): Promise<number> {
     return this.orm.em.fork().count(EvmLog, { timestamp: { $gt: Date.now() / 1000 - seconds }})
   }
 
@@ -275,7 +276,7 @@ import { AgentVaultInfo } from "../database/entities/state/agent"
 import { EvmLog } from "../database/entities/logs"
 async function main() {
   const metrics = await Analytics.create(config.db)
-  console.log(await metrics.eventsPer())
+  console.log(await metrics.totalFreeLots())
   await metrics.orm.close()
 }
 
