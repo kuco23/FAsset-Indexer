@@ -167,8 +167,20 @@ export class FAssetIndexerController {
   }
 
   @Get('/total-free-lots')
-  getTotalFreeLots(): Promise<ApiResponse<string>> {
-    return apiResponse(this.appService.totalFreeLots().then(String), 200)
+  getTotalFreeLots(): Promise<ApiResponse<{
+    publicLots: string,
+    privateLots: string,
+    liquidationLots: string,
+    normalLots: string
+  }>> {
+    return apiResponse(this.appService.totalFreeLots().then(resp => {
+      return {
+        publicLots: resp.publicLots.toString(),
+        privateLots: resp.privateLots.toString(),
+        liquidationLots: resp.liquidationLots.toString(),
+        normalLots: resp.normalLots.toString()
+      }
+    }), 200)
   }
 
   @Get('/agents-in-liquidation')

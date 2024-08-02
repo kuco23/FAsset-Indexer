@@ -1,4 +1,6 @@
 import { createOrm, getVar } from "../database/utils"
+import { EvmLog } from "../database/entities/logs"
+import { AgentVaultInfo } from "../database/entities/state/agent"
 import { CollateralReserved, MintingExecuted } from "../database/entities/events/minting"
 import { RedemptionDefault, RedemptionPerformed, RedemptionRequested } from "../database/entities/events/redemption"
 import { FullLiquidationStarted, LiquidationPerformed } from "../database/entities/events/liquidation"
@@ -211,13 +213,28 @@ export class Analytics {
   ////////////////////////////////////////////////////////////////////
   // system health
 
-  async totalFreeLots(): Promise<bigint> {
+  async totalFreeLots(): Promise<{
+    publicLots: bigint,
+    privateLots: bigint,
+    liquidationLots: bigint,
+    normalLots: bigint
+  }> {
+    const publicLots = await this._totalFreeLots(true)
+    const privateLots = await this._totalFreeLots(false)
+    const liquidationLots = await this._totalFreeLots(undefined, true)
+    const normalLots = await this._totalFreeLots(undefined, false)
+    return { publicLots, privateLots, liquidationLots, normalLots }
+  }
+
+  private async _totalFreeLots(publicAgents?: boolean, inLiquidation?: boolean): Promise<bigint> {
+    const publicFilter = (publicAgents !== undefined) ? `AND avi.publicly_available = ${publicAgents}` : ""
+    const liquidationFilter = (inLiquidation !== undefined) ? `AND avi.status ${inLiquidation ? `> 0`: `= 0`}` : ""
     const em = this.orm.em.fork()
     const result = await em.getConnection('read').execute(`
       SELECT SUM(avi.free_collateral_lots) as total
       FROM agent_vault_info avi
       INNER JOIN agent_vault av ON avi.agent_vault_id = av.id
-      WHERE avi.publicly_available = TRUE AND av.destroyed = FALSE
+      WHERE av.destroyed = FALSE ${publicFilter} ${liquidationFilter}
     `)
     return result[0].total
   }
@@ -272,12 +289,10 @@ export class Analytics {
 }
 
 import { config } from "../config"
-import { AgentVaultInfo } from "../database/entities/state/agent"
-import { EvmLog } from "../database/entities/logs"
-async function main() {
+/* async function main() {
   const metrics = await Analytics.create(config.db)
   console.log(await metrics.totalFreeLots())
   await metrics.orm.close()
 }
 
-main()
+main() */
